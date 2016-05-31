@@ -9,7 +9,7 @@ m_sphere = 0.008; 	      % kg +/- 0.2g
 r_sphere = 3.9/1000;      % m +/- 0.1mm
 Rabc = 95.2;              % rayon de la plaque par rapport aux actionneurs
 Rdef = 80;                % rayon de la plaque par rapport aux points DEF
-R_bobine = 3.6; 		  % Ohms % ‡ vÈrifier!
+R_bobine = 3.6; 		  % Ohms % √† v√©rifier!
 L_bobine = 115; 		  % mH
 
 b_E1 = 13.029359254409743;
@@ -46,7 +46,7 @@ eqnB2 = -1/FsB;
 eqnC1 = 1/FeC;
 eqnC2 = -1/FsC;
 
-%dÈrivÈes partielles des Fek et Fsk par rapport ‡ Phi, Theta et Z --------
+%d√©riv√©es partielles des Fek et Fsk par rapport √† Phi, Theta et Z --------
 
 dFeA_Phi = diff(eqnA1, Phi);
 dFeA_Theta = diff(eqnA1, Theta);
@@ -72,51 +72,64 @@ dFsC_Phi = diff(eqnC2, Phi);
 dFsC_Theta = diff(eqnC2, Theta);
 dFsC_Z = diff(eqnC2, Z);
 
-disp('DÈrivÈe partielle de FeA par rapport ‡ Phi = ')
+disp('D√©riv√©e partielle de FeA par rapport √† Phi = ')
 disp(dFeA_Phi)
-disp('DÈrivÈe partielle de FeA par rapport ‡ Theta = ')
+disp('D√©riv√©e partielle de FeA par rapport √† Theta = ')
 disp(dFeA_Theta)
-disp('DÈrivÈe partielle de FeA par rapport ‡ Z = ')
+disp('D√©riv√©e partielle de FeA par rapport √† Z = ')
 disp(dFeA_Z)
 
-disp('DÈrivÈe partielle de FsA par rapport ‡ Phi = ')
+disp('D√©riv√©e partielle de FsA par rapport √† Phi = ')
 disp(dFsA_Phi)
-disp('DÈrivÈe partielle de FsA par rapport ‡ Theta = ')
+disp('D√©riv√©e partielle de FsA par rapport √† Theta = ')
 disp(dFsA_Theta)
-disp('DÈrivÈe partielle de FsA par rapport ‡ Z = ')
+disp('D√©riv√©e partielle de FsA par rapport √† Z = ')
 disp(dFsA_Z)
 
-disp('DÈrivÈe partielle de FeB par rapport ‡ Phi = ')
+disp('D√©riv√©e partielle de FeB par rapport √† Phi = ')
 disp(dFeB_Phi)
-disp('DÈrivÈe partielle de FeB par rapport ‡ Theta = ')
+disp('D√©riv√©e partielle de FeB par rapport √† Theta = ')
 disp(dFeB_Theta)
-disp('DÈrivÈe partielle de FeB par rapport ‡ Z = ')
+disp('D√©riv√©e partielle de FeB par rapport √† Z = ')
 disp(dFeB_Z)
 
-disp('DÈrivÈe partielle de FsB par rapport ‡ Phi = ')
+disp('D√©riv√©e partielle de FsB par rapport √† Phi = ')
 disp(dFsB_Phi)
-disp('DÈrivÈe partielle de FsB par rapport ‡ Theta = ')
+disp('D√©riv√©e partielle de FsB par rapport √† Theta = ')
 disp(dFsB_Theta)
-disp('DÈrivÈe partielle de FsB par rapport ‡ Z = ')
+disp('D√©riv√©e partielle de FsB par rapport √† Z = ')
 disp(dFsB_Z)
 
-disp('DÈrivÈe partielle de FeC par rapport ‡ Phi = ')
+disp('D√©riv√©e partielle de FeC par rapport √† Phi = ')
 disp(dFeC_Phi)
-disp('DÈrivÈe partielle de FeC par rapport ‡ Theta = ')
+disp('D√©riv√©e partielle de FeC par rapport √† Theta = ')
 disp(dFeC_Theta)
-disp('DÈrivÈe partielle de FeC par rapport ‡ Z = ')
+disp('D√©riv√©e partielle de FeC par rapport √† Z = ')
 disp(dFeC_Z)
 
-disp('DÈrivÈe partielle de FsC par rapport ‡ Phi = ')
+disp('D√©riv√©e partielle de FsC par rapport √† Phi = ')
 disp(dFsC_Phi)
-disp('DÈrivÈe partielle de FsC par rapport ‡ Theta = ')
+disp('D√©riv√©e partielle de FsC par rapport √† Theta = ')
 disp(dFsC_Theta)
-disp('DÈrivÈe partielle de FsC par rapport ‡ Z = ')
+disp('D√©riv√©e partielle de FsC par rapport √† Z = ')
 disp(dFsC_Z)
 
 
+%d√©riv√©e des num√©rateurs pour Fek ----------------------------------------
 
-% 13 variables d'Ètat ----------------------------------------------------
+dFeA_num_Ia = diff(numA, Ia);
+dFeB_num_Ib = diff(numB, Ib);
+dFeC_num_Ic = diff(numC, Ic);
+
+
+disp('D√©riv√©e partielle du num√©rateur de FeA par rapport √† Ia = ')
+disp(dFeA_num_Ia)
+disp('D√©riv√©e partielle du num√©rateur de FeC par rapport √† Ib = ')
+disp(dFeB_num_Ib)
+disp('D√©riv√©e partielle du num√©rateur de FeC par rapport √† Ic = ')
+disp(dFeC_num_Ic)
+
+% 13 variables d'√©tat ----------------------------------------------------
 
 d_phi = diff(Phi);
 d_theta = diff(Theta);
