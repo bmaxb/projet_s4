@@ -1,15 +1,15 @@
 clc; clear; close all;
 
 % Constantes --------------------------------------------------------------
-g = 9.81;				  % m/s^2
-m_plaque = 0.425; 	      % kg +/- 10g
-m_sphere = 0.008; 	      % kg +/- 0.2g
-m_ps = m_plaque + m_sphere;
-r_sphere = 3.9 / 1000;    % m +/- 0.1mm
-r_ABC = 95.2 / 1000;      % m, rayon de la plaque par rapport aux actionneurs
-r_DEF = 80 / 1000;        % rayon de la plaque par rapport aux points DEF
-R_bobine = 3.6; 		  % Ohms % à vérifier!
-L_bobine = 115; 		  % mH
+g = 9.81;				    % m/s^2
+m_plaque = 0.425; 	        % kg +/- 10g
+m_sphere = 0.008; 	        % kg +/- 0.2g
+m_ps = m_plaque + m_sphere; % kg
+r_sphere = 3.9 / 1000;      % m +/- 0.1mm
+r_ABC = 95.2 / 1000;        % m, rayon de la plaque par rapport aux actionneurs
+r_DEF = 80 / 1000;          % rayon de la plaque par rapport aux points DEF
+R_bobine = 3.6; 		    % Ohms % à vérifier!
+L_bobine = 115; 		    % mH
 
 b_E1 = 13.029359254409743;
 
@@ -118,3 +118,5 @@ ae1 = 1.3463; ae2 = 349.0774; ae3 = 1450.3848; ae4 = 703344.2113;
 as1 = -0.22862; as2 = 176.4976; as3 = -16589.0203; as4 = 767085.5302;
 
 I_eq = solve(subs(FA) == (-m_ps*g)/3, Ia);
+disp('Valeurs des courants à l''équilibre (où Ia=Ib=Ic): ')
+disp(vpa(I_eq, 6))
