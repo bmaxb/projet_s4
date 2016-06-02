@@ -22,31 +22,21 @@ Fb_eq = Fc_eq - (Ms*g*Ys_eq/(Rabc*cos(pi/6)));
 Fa_eq = -Fb_eq - Fc_eq - M*g;
 
 %% Courants a l'equilibre
-As0 = -0.22862;
-As1 = 176.4976;
-As2 = -16589.0203;
-As3 = 767085.5302;
+syms As0 As1 As2 As3 Ae0 Ae1 Ae2 Ae3
+sgn_ik = 1;
+
 Fsa_eq = -1 / (As0 + As1*Z0_eq + As2*Z0_eq^2 + As3*Z0_eq^3);
 Fsb_eq = -1 / (As0 + As1*Z0_eq + As2*Z0_eq^2 + As3*Z0_eq^3);
 Fsc_eq = -1 / (As0 + As1*Z0_eq + As2*Z0_eq^2 + As3*Z0_eq^3);
 
-Ae0_1 = 1.3463;
-Ae1_1 = 349.0774;
-Ae2_1 = 1450.3848;
-Ae3_1 = 703344.2113;
+denom_Ae_1 = Ae0 + Ae1*Z0_eq + Ae2*Z0_eq^2 + Ae3*Z0_eq^3;
 
-Ae0_2 = 1.3334;
-Ae1_2 = 362.2141;
-Ae2_2 = 2183.4014 ;
-Ae3_2 = 705425.2882;
+I_a = sgn_ik;
+I_b = b_E1;
+IA_c = (Fa_eq - Fsa_eq) * denom_Ae_1 * sgn_ik;
+IB_c = (Fb_eq - Fsb_eq) * denom_Ae_1 * sgn_ik;
+IC_c = (Fc_eq - Fsc_eq) * denom_Ae_1 * sgn_ik;
 
-sgn_ik = 1;
-denom_Ae_1 = Ae0_1 + Ae1_1*Z0_eq + Ae2_1*Z0_eq^2 + Ae3_1*Z0_eq^3;
-denom_Ae_2 = Ae0_2 + Ae1_2*Z0_eq + Ae2_2*Z0_eq^2 + Ae3_2*Z0_eq^3;
-
-a = sgn_ik;
-b = b_E1;
-c = (Fa_eq - Fsa_eq) * denom_Ae_1 * sgn_ik;
-
-p = [a b c];
-r = roots(p)
+E_Ia_eq = (-I_b + sqrt(I_b^2 - 4*I_a*IA_c))/(2*I_a);
+E_Ib_eq = (-I_b + sqrt(I_b^2 - 4*I_a*IB_c))/(2*I_a);
+E_Ic_eq = (-I_b + sqrt(I_b^2 - 4*I_a*IC_c))/(2*I_a);
