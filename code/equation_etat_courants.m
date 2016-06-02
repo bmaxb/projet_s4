@@ -107,3 +107,14 @@ D = zeros(7, 3);
 
 clc; disp('Matrix A, B, C and D completed.')
 
+% Variables a l'etat d'equilibre ------------------------------------------
+phi = 0;
+theta = 0;
+Z = 0;
+xs = 0;
+ys = 0;
+
+ae1 = 1.3463; ae2 = 349.0774; ae3 = 1450.3848; ae4 = 703344.2113;
+as1 = -0.22862; as2 = 176.4976; as3 = -16589.0203; as4 = 767085.5302;
+
+I_eq = solve(subs(FA) == (-m_ps*g)/3, Ia);
