@@ -40,7 +40,7 @@ as = sym('as',[4 1]);
 
 % 3 entrees
 syms Va Vb Vc;
-V = [Va Vb Vc];
+U = [Va Vb Vc];
 
 % 13 variables d'etats
 syms phi theta Z w_phi w_theta v_z xs ys v_sx v_sy Ia Ib Ic
@@ -91,7 +91,7 @@ B = sym('B', [13 3]);
 for i = 1:13
     for j = 1:3
         clc; disp(['Calculating B(' num2str(i) ', ' num2str(j) ')...'])
-        B(i, j) = diff(EQ(i), V(j));
+        B(i, j) = diff(EQ(i), U(j));
     end
 end
 
