@@ -22,8 +22,7 @@ tfin = 50;
 %initialisation
 bancEssaiConstantes
 %bancessai_ini  %faites tous vos calculs de modele ici
-modele_non_lineaire
-
+MatlabProjet
 %Calcul des compensateurs
 %iniCTL_ver4    %Calculez vos compensateurs ici
 
@@ -31,6 +30,7 @@ modele_non_lineaire
 open_system('DYNctl_ver4_etud_obfusc')
 set_param('DYNctl_ver4_etud_obfusc','AlgebraicLoopSolver','LineSearch')
 sim('DYNctl_ver4_etud_obfusc')
+
 
 %affichage
 %trajectoires
