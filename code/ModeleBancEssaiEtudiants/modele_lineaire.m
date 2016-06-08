@@ -1,5 +1,6 @@
+clc; clear; close all;
 % Initialisation des matrices ---------------------------------------------
-equation_etat_courants
+MatlabProjet
 
 % Simulink ----------------------------------------------------------------
 xi = [];
