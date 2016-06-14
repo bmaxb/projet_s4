@@ -53,7 +53,7 @@ Y = [dm_D dm_E dm_F xs, ys, v_sx, v_sy];
 
 % Linearisation des forces electromagnetiques -----------------------------
 Zk = @(xk, yk) Z - xk*theta + yk*phi;
-Fe = @(ik, zk) ((ik^2+b_E1*abs(ik))*sign(ik)) / (ae(1) + ae(2)*zk + ae(3)*zk^2 + ae(4)*zk^3);
+Fe = @(ik, zk) ((ik^2 + b_E1*abs(ik))*sign(ik)) / (ae(1) + ae(2)*zk + ae(3)*zk^2 + ae(4)*zk^3);
 Fs = @(zk) (-1) / (as(1) + as(2)*zk + as(3)*zk^2 + as(4)*zk^3);
 
 FA = Fe(Ia, Zk(XA, YA)) + Fs(Zk(XA, YA));
@@ -94,7 +94,7 @@ for i = 1:13
     end
 end
 
-C = sym('B', [7 13]);
+C = sym('C', [7 13]);
 for i = 1:7
     for j = 1:13
         clc; disp(['Calculating C(' num2str(i) ', ' num2str(j) ')...'])
