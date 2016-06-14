@@ -81,7 +81,7 @@ EQ = [d_phi d_theta d_Z d2_phi d2_theta d2_Z d_Xs d_Ys d2_Xs d2_Ys d_Ia d_Ib d_I
 A = sym('A', [13 13]);
 for i = 1:13
     for j = 1:13
-        clc; disp(['Calculating A(' num2str(i) ', ' num2str(j) ')...'])
+        clc; disp(['Calcul de la matrice A(' num2str(i) ', ' num2str(j) ')...'])
         A(i, j) = diff(EQ(i), X(j));
     end
 end
@@ -89,7 +89,7 @@ end
 B = sym('B', [13 3]);
 for i = 1:13
     for j = 1:3
-        clc; disp(['Calculating B(' num2str(i) ', ' num2str(j) ')...'])
+        clc; disp(['Calcul de la matrice B(' num2str(i) ', ' num2str(j) ')...'])
         B(i, j) = diff(EQ(i), U(j));
     end
 end
@@ -97,14 +97,14 @@ end
 C = sym('C', [7 13]);
 for i = 1:7
     for j = 1:13
-        clc; disp(['Calculating C(' num2str(i) ', ' num2str(j) ')...'])
+        clc; disp(['Calcul de la matrice C(' num2str(i) ', ' num2str(j) ')...'])
         C(i, j) = diff(Y(i), X(j));
     end
 end
 
 D = zeros(7, 3);
 
-clc; disp('Matrix A, B, C and D completed.')
+clc; disp('Matrices A, B, C and D completees.')
 
 % Variables a l'etat d'equilibre ------------------------------------------
 phi = 0;
@@ -116,6 +116,11 @@ ys = 0;
 ae1 = 1.3463; ae2 = 349.0774; ae3 = 1450.3848; ae4 = 703344.2113;
 as1 = -0.22862; as2 = 176.4976; as3 = -16589.0203; as4 = 767085.5302;
 
-I_eq = solve(subs(FA) == (-m_ps*g)/3, Ia);
-disp('Valeurs des courants à l''équilibre (où Ia=Ib=Ic): ')
-disp(vpa(I_eq, 6))
+disp('Calcul des valeurs de courants a l''equilibre...')
+I_eq = solve([subs(d2_phi) == 0, subs(d2_theta) == 0, subs(d2_Z) == 0], [Ia, Ib, Ic]);
+clc;
+
+disp('Valeurs des courants à l''equilibre: ')
+disp(['Ia = ' num2str(double(I_eq.Ia))])
+disp(['Ib = ' num2str(double(I_eq.Ib))])
+disp(['Ic = ' num2str(double(I_eq.Ic))])
