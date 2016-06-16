@@ -16,23 +16,30 @@ end
 
 % Extrapolation des coefficients -----------------------------------------
 Coef = phi\Y';
-disp(Coef)
+plot(X, Y, '*b');
+axis([0 15 -5 15])
+hold on
+% RMS et Correlation pour determiner les coefficients utiles
+% Calcul des valeurs
+Vals = 0;
+for n = 1:length(Coef)
+    Vals = Vals + Coef(n).*X.^(n-1);     
+    plot(X, Vals, 'r')  
+    RMS = sqrt(1/length(X) * sum((Vals - Y).^2));
+    Corr = sum((Vals - mean(Y)).^2)/sum((Y - mean(Y)).^2);  
+    if(Corr == 1)
+        break
+    end  
+end
 
 % Dessin des graphiques (si showGraph == 1) -------------------------------
-if showGraph == 1    
-    
-    % Calcul des valeurs
-    Vals = 0;
-    for n = 1:length(C)
-      Vals = Vals + C(n).*t.^(n-1);
-    end
-    
+if showGraph == 1     
     % Plot
     figure
     plot(X, Y, '*b');
     hold on
     plot(t, Vals, 'r')
-    title(['Interpolation generique (degree ' num2str(length(C)) ')'])
+    title(['Interpolation generique (degree ' num2str(length(Coef)) ')'])
     xlabel('x'); ylabel('y')
 end
 
