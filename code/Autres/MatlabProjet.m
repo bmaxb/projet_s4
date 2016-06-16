@@ -103,7 +103,7 @@ end
 
 D = zeros(7, 3);
 
-clc; disp('Matrices A, B, C and D compleèté!')
+clc; disp('Matrices A, B, C and D complété!')
 
 % Variables a l'etat d'equilibre ------------------------------------------
 [phi, theta, Z, xs, ys] = deal(0);
@@ -137,16 +137,16 @@ disp(['Vb = ' num2str(double(Vb)) ' V'])
 disp(['Vc = ' num2str(double(Vc)) ' V'])
 
 disp(' ')
-A = subs(A);
-B = subs(B);
-C = subs(C);
-D = subs(D);
+A = double(subs(A));
+B = double(subs(B));
+C = double(subs(C));
+D = double(subs(D));
 disp('Substitution des matrices ABCD à l''équilibre terminé!')
 
 
-syms phi theta Z w_phi w_theta v_z xs ys v_sx v_sy Ia Ib Ic Va Vb Vc real
-delta_x = [phi-phi_eq, theta-theta_eq, Z-Z0_eq, w_phi-w_phi_eq, w_theta-w_theta_eq, v_z-v_z_eq, xs-xs_eq, ys-ys_eq, v_sx-v_sx_eq, v_sy-v_sy_eq, Ia-Ia_eq, Ib-Ib_eq, Ic-Ic_eq]';
-delta_u = [Va-Va_eq, Vb-Vb_eq, Vc-Vc_eq]';
-
-delta_x_p = A*delta_x+B*delta_u;
-delta_y = C*delta_x+D*delta_u;
+% syms phi theta Z w_phi w_theta v_z xs ys v_sx v_sy Ia Ib Ic Va Vb Vc real
+% delta_x = [phi-phi_eq, theta-theta_eq, Z-Z0_eq, w_phi-w_phi_eq, w_theta-w_theta_eq, v_z-v_z_eq, xs-xs_eq, ys-ys_eq, v_sx-v_sx_eq, v_sy-v_sy_eq, Ia-Ia_eq, Ib-Ib_eq, Ic-Ic_eq]';
+% delta_u = [Va-Va_eq, Vb-Vb_eq, Vc-Vc_eq]';
+% 
+% delta_x_p = A*delta_x+B*delta_u;
+% delta_y = C*delta_x+D*delta_u;
