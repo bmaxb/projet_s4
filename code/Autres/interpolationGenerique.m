@@ -1,34 +1,40 @@
-function [ output ] = interpolationGenerique( x, y, showGraph )
+function [Coef] = interpolationGenerique(X, Y, Ts, showGraph)
 %INTERPOLATION_GENERIQUE Interpolation Generique
+
 %   Calcul la courbe en tout point
-syms t
-if length(x) ~= length(y)
-    disp(['x = ' mat2str(x')]); disp(['y = ' mat2str(y')])
+if length(X) ~= length(Y)
+    disp(['X = ' mat2str(X')]); disp(['Y = ' mat2str(Y')])
     error('Les matrices donnees ne sont pas de meme taille!')
 end
 
+t = min(X):Ts:max(X);
+
 % Calcul de la matrice phi ------------------------------------------------
-for i = length(x):-1:1
-    phi(:,i) = x.^(i-1);
+for i = length(X):-1:1
+    phi(:,i) = X.^(i-1);
 end
 
 % Extrapolation des coefficients -----------------------------------------
-C = phi\y;
-output = 0;
-for n = 1:length(C)
-    output = output + C(n).*t.^(n-1);
-end
+Coef = phi\Y';
+disp(Coef)
 
 % Dessin des graphiques (si showGraph == 1) -------------------------------
-if showGraph == 1
-    t = (0:.5:x(end))';
+if showGraph == 1    
+    
+    % Calcul des valeurs
+    Vals = 0;
+    for n = 1:length(C)
+      Vals = Vals + C(n).*t.^(n-1);
+    end
+    
+    % Plot
     figure
-    plot(x, y, '*b'); hold on
-    plot(t, subs(output), 'r')
+    plot(X, Y, '*b');
+    hold on
+    plot(t, Vals, 'r')
     title(['Interpolation generique (degree ' num2str(length(C)) ')'])
     xlabel('x'); ylabel('y')
 end
-
 
 end
 
