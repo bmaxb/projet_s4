@@ -7,7 +7,7 @@ m_ps = m_plaque + m_sphere; % kg
 r_sphere = 3.9 / 1000;      % m +/- 0.1mm
 r_ABC = 95.2 / 1000;        % m, rayon de la plaque par rapport aux actionneurs
 r_DEF = 80 / 1000;          % rayon de la plaque par rapport aux points DEF
-R_bobine = 3.6; 		    % Ohms % à vérifier!
+R_bobine = 3.6; 		    % Ohms % ? v?rifier!
 L_bobine = 115; 		    % mH
 
 b_E1 = 13.029359254409743;
@@ -39,7 +39,7 @@ as = sym('as',[4 1]);
 
 % 3 entrees
 syms Va Vb Vc;
-U = [Va Vb Vc];
+V = [Va Vb Vc];
 
 % 13 variables d'etats
 syms phi theta Z w_phi w_theta v_z xs ys v_sx v_sy Ia Ib Ic
@@ -53,7 +53,7 @@ Y = [dm_D dm_E dm_F xs, ys, v_sx, v_sy];
 
 % Linearisation des forces electromagnetiques -----------------------------
 Zk = @(xk, yk) Z - xk*theta + yk*phi;
-Fe = @(ik, zk) ((ik^2 + b_E1*abs(ik))*sign(ik)) / (ae(1) + ae(2)*zk + ae(3)*zk^2 + ae(4)*zk^3);
+Fe = @(ik, zk) ((ik^2+b_E1*abs(ik))*sign(ik)) / (ae(1) + ae(2)*zk + ae(3)*zk^2 + ae(4)*zk^3);
 Fs = @(zk) (-1) / (as(1) + as(2)*zk + as(3)*zk^2 + as(4)*zk^3);
 
 FA = Fe(Ia, Zk(XA, YA)) + Fs(Zk(XA, YA));
@@ -81,7 +81,7 @@ EQ = [d_phi d_theta d_Z d2_phi d2_theta d2_Z d_Xs d_Ys d2_Xs d2_Ys d_Ia d_Ib d_I
 A = sym('A', [13 13]);
 for i = 1:13
     for j = 1:13
-        clc; disp(['Calcul de la matrice A(' num2str(i) ', ' num2str(j) ')...'])
+        clc; disp(['Calculating A(' num2str(i) ', ' num2str(j) ')...'])
         A(i, j) = diff(EQ(i), X(j));
     end
 end
@@ -89,22 +89,22 @@ end
 B = sym('B', [13 3]);
 for i = 1:13
     for j = 1:3
-        clc; disp(['Calcul de la matrice B(' num2str(i) ', ' num2str(j) ')...'])
-        B(i, j) = diff(EQ(i), U(j));
+        clc; disp(['Calculating B(' num2str(i) ', ' num2str(j) ')...'])
+        B(i, j) = diff(EQ(i), V(j));
     end
 end
 
-C = sym('C', [7 13]);
+C = sym('B', [7 13]);
 for i = 1:7
     for j = 1:13
-        clc; disp(['Calcul de la matrice C(' num2str(i) ', ' num2str(j) ')...'])
+        clc; disp(['Calculating C(' num2str(i) ', ' num2str(j) ')...'])
         C(i, j) = diff(Y(i), X(j));
     end
 end
 
 D = zeros(7, 3);
 
-clc; disp('Matrices A, B, C and D completees.')
+clc; disp('Matrix A, B, C and D completed.')
 
 % Variables a l'etat d'equilibre ------------------------------------------
 phi = 0;
@@ -113,14 +113,43 @@ Z = 0;
 xs = 0;
 ys = 0;
 
+%-1A
 ae1 = 1.3463; ae2 = 349.0774; ae3 = 1450.3848; ae4 = 703344.2113;
+%-2A
+%ae1 = 1.3334; ae2 = 362.2141; ae3 = 2183.4014; ae4 = 705425.2882;
+
 as1 = -0.22862; as2 = 176.4976; as3 = -16589.0203; as4 = 767085.5302;
 
 disp('Calcul des valeurs de courants a l''equilibre...')
 I_eq = solve([subs(d2_phi) == 0, subs(d2_theta) == 0, subs(d2_Z) == 0], [Ia, Ib, Ic]);
 clc;
 
-disp('Valeurs des courants à l''equilibre: ')
-disp(['Ia = ' num2str(double(I_eq.Ia))])
-disp(['Ib = ' num2str(double(I_eq.Ib))])
-disp(['Ic = ' num2str(double(I_eq.Ic))])
+%Matrice ABCD à l'équilibre
+MatlabEquilibre
+Ia=I_eq.Ia;
+Ib=I_eq.Ib;
+Ic=I_eq.Ic;
+
+Va=Ia*R_bobine;
+Vb=Ib*R_bobine;
+Vc=Ic*R_bobine;
+
+disp('Valeurs des courants/tension a l''equilibre: ')
+disp(['Ia = ' num2str(double(Ia))])
+disp(['Ib = ' num2str(double(Ib))])
+disp(['Ic = ' num2str(double(Ic))])
+disp(['Va = ' num2str(double(Va))])
+disp(['Vb = ' num2str(double(Vb))])
+disp(['Vc = ' num2str(double(Vc))])
+
+A=subs(A);
+B=subs(B);
+C=subs(C);
+D=subs(D);
+
+syms phi theta Z w_phi w_theta v_z xs ys v_sx v_sy Ia Ib Ic Va Vb Vc real
+delta_x=[phi-phi_eq, theta-theta_eq, Z-Z0_eq, w_phi-w_phi_eq, w_theta-w_theta_eq, v_z-v_z_eq, xs-Xs_eq, ys-Ys_eq, v_sx-v_sx_eq, v_sy-v_sy_eq, Ia-Ia_eq, Ib-Ib_eq, Ic-Ic_eq]';
+delta_u=[Va-Va_eq, Vb-Vb_eq, Vc-Vc_eq]';
+
+delta_x_p=A*delta_x+B*delta_u;
+delta_y=C*delta_x+D*delta_u;
