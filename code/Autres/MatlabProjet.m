@@ -1,4 +1,3 @@
-
 % Constantes --------------------------------------------------------------
 g = 9.81;				    % m/s^2
 m_plaque = 0.425; 	        % kg +/- 10g
@@ -53,7 +52,7 @@ Y = [dm_D dm_E dm_F xs, ys, v_sx, v_sy];
 
 % Linearisation des forces electromagnetiques -----------------------------
 Zk = @(xk, yk) Z - xk*theta + yk*phi;
-Fe = @(ik, zk) ((ik^2+b_E1*abs(ik))*sign(ik)) / (ae(1) + ae(2)*zk + ae(3)*zk^2 + ae(4)*zk^3);
+Fe = @(ik, zk) ((ik^2 + b_E1*abs(ik))*sign(ik)) / (ae(1) + ae(2)*zk + ae(3)*zk^2 + ae(4)*zk^3);
 Fs = @(zk) (-1) / (as(1) + as(2)*zk + as(3)*zk^2 + as(4)*zk^3);
 
 FA = Fe(Ia, Zk(XA, YA)) + Fs(Zk(XA, YA));
@@ -81,7 +80,7 @@ EQ = [d_phi d_theta d_Z d2_phi d2_theta d2_Z d_Xs d_Ys d2_Xs d2_Ys d_Ia d_Ib d_I
 A = sym('A', [13 13]);
 for i = 1:13
     for j = 1:13
-        clc; disp(['Calculating A(' num2str(i) ', ' num2str(j) ')...'])
+        clc; disp(['Calcul de la matrice A(' num2str(i) ', ' num2str(j) ')...'])
         A(i, j) = diff(EQ(i), X(j));
     end
 end
@@ -89,67 +88,65 @@ end
 B = sym('B', [13 3]);
 for i = 1:13
     for j = 1:3
-        clc; disp(['Calculating B(' num2str(i) ', ' num2str(j) ')...'])
+        clc; disp(['Calcul de la matrice B(' num2str(i) ', ' num2str(j) ')...'])
         B(i, j) = diff(EQ(i), V(j));
     end
 end
 
-C = sym('B', [7 13]);
+C = sym('C', [7 13]);
 for i = 1:7
     for j = 1:13
-        clc; disp(['Calculating C(' num2str(i) ', ' num2str(j) ')...'])
+        clc; disp(['Calcul de la matrice C(' num2str(i) ', ' num2str(j) ')...'])
         C(i, j) = diff(Y(i), X(j));
     end
 end
 
 D = zeros(7, 3);
 
-clc; disp('Matrix A, B, C and D completed.')
+clc; disp('Matrices A, B, C and D complété!')
 
 % Variables a l'etat d'equilibre ------------------------------------------
-phi = 0;
-theta = 0;
-Z = 0;
-xs = 0;
-ys = 0;
-
-%-1A
-ae1 = 1.3463; ae2 = 349.0774; ae3 = 1450.3848; ae4 = 703344.2113;
-%-2A
-%ae1 = 1.3334; ae2 = 362.2141; ae3 = 2183.4014; ae4 = 705425.2882;
+[phi, theta, Z, xs, ys] = deal(0);
 
 as1 = -0.22862; as2 = 176.4976; as3 = -16589.0203; as4 = 767085.5302;
+% Pour -1A:
+ae1 = 1.3463; ae2 = 349.0774; ae3 = 1450.3848; ae4 = 703344.2113;
+% Pour -2A:
+%ae1 = 1.3334; ae2 = 362.2141; ae3 = 2183.4014; ae4 = 705425.2882;
 
-disp('Calcul des valeurs de courants a l''equilibre...')
-I_eq = solve([subs(d2_phi) == 0, subs(d2_theta) == 0, subs(d2_Z) == 0], [Ia, Ib, Ic]);
+disp('Calcul des valeurs de courants a l''équilibre...')
+[Ia_eq, Ib_eq, Ic_eq] = solve([subs(d2_phi) == 0, subs(d2_theta) == 0, subs(d2_Z) == 0], [Ia, Ib, Ic]);
 clc;
 
-%Matrice ABCD à l'équilibre
-MatlabEquilibre
-Ia=I_eq.Ia;
-Ib=I_eq.Ib;
-Ic=I_eq.Ic;
+% Matrices ABCD à l'equilibre ---------------------------------------------
+[phi_eq, theta_eq, Z0_eq, w_phi_eq, w_theta_eq, v_z_eq, xs_eq, ys_eq, v_sx_eq, v_sy_eq] = deal(0);
 
-Va=Ia*R_bobine;
-Vb=Ib*R_bobine;
-Vc=Ic*R_bobine;
+Va_eq = Ia_eq*R_bobine;
+Vb_eq = Ib_eq*R_bobine;
+Vc_eq = Ic_eq*R_bobine;
 
-disp('Valeurs des courants/tension a l''equilibre: ')
-disp(['Ia = ' num2str(double(Ia))])
-disp(['Ib = ' num2str(double(Ib))])
-disp(['Ic = ' num2str(double(Ic))])
-disp(['Va = ' num2str(double(Va))])
-disp(['Vb = ' num2str(double(Vb))])
-disp(['Vc = ' num2str(double(Vc))])
+Ia = Ia_eq; Ib = Ib_eq; Ic = Ic_eq;
+Va = Va_eq; Vb = Vb_eq; Vc = Vc_eq;
 
-A=subs(A);
-B=subs(B);
-C=subs(C);
-D=subs(D);
+disp('Valeurs des courants/tension a l''équilibre: ')
+disp(['Ia = ' num2str(double(Ia)) ' A'])
+disp(['Ib = ' num2str(double(Ib)) ' A'])
+disp(['Ic = ' num2str(double(Ic)) ' A'])
+disp(['Va = ' num2str(double(Va)) ' V'])
+disp(['Vb = ' num2str(double(Vb)) ' V'])
+disp(['Vc = ' num2str(double(Vc)) ' V'])
 
-syms phi theta Z w_phi w_theta v_z xs ys v_sx v_sy Ia Ib Ic Va Vb Vc real
-delta_x=[phi-phi_eq, theta-theta_eq, Z-Z0_eq, w_phi-w_phi_eq, w_theta-w_theta_eq, v_z-v_z_eq, xs-Xs_eq, ys-Ys_eq, v_sx-v_sx_eq, v_sy-v_sy_eq, Ia-Ia_eq, Ib-Ib_eq, Ic-Ic_eq]';
-delta_u=[Va-Va_eq, Vb-Vb_eq, Vc-Vc_eq]';
+disp(' ')
+A = double(subs(A));
+B = double(subs(B));
+C = double(subs(C));
+D = double(subs(D));
+disp('Substitution des matrices ABCD à l''équilibre terminé!')
 
-delta_x_p=A*delta_x+B*delta_u;
-delta_y=C*delta_x+D*delta_u;
+
+% syms phi theta Z w_phi w_theta v_z xs ys v_sx v_sy Ia Ib Ic Va Vb Vc real
+% delta_x = [phi-phi_eq, theta-theta_eq, Z-Z0_eq, w_phi-w_phi_eq, w_theta-w_theta_eq, v_z-v_z_eq, xs-xs_eq, ys-ys_eq, v_sx-v_sx_eq, v_sy-v_sy_eq, Ia-Ia_eq, Ib-Ib_eq, Ic-Ic_eq]';
+% delta_u = [Va-Va_eq, Vb-Vb_eq, Vc-Vc_eq]';
+% 
+% delta_x_p = A*delta_x+B*delta_u;
+% delta_y = C*delta_x+D*delta_u;
