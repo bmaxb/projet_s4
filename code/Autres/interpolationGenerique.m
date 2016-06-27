@@ -15,7 +15,7 @@ for i = length(X):-1:1
 end
 
 % Extrapolation des coefficients -----------------------------------------
-Coef = phi\Y';
+Coef = phi\Y;
 
 % RMS et Correlation pour determiner les coefficients utiles
 % Calcul des valeurs
