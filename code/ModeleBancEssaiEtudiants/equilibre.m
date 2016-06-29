@@ -8,13 +8,6 @@ Z = 0;
 xs = 0;
 ys = 0;
 
-% Valeurs des coefs. des force Fk
-as1 = 0.052961; as2 = 30.5716; as3 = -1152.4168; as4 = 344545.4587;
-% Pour -1A:
-ae1 = 1.3463; ae2 = 349.0774; ae3 = 1450.3848; ae4 = 703344.2113;
-% Pour -2A:
-%ae1 = 1.3334; ae2 = 362.2141; ae3 = 2183.4014; ae4 = 705425.2882;
-
 % Calcul du courant à l'équilibre -----------------------------------------
 disp('Calcul des valeurs de courants a l''équilibre...')
 [Ia_eq, Ib_eq, Ic_eq] = solve([subs(d2_phi) == 0, subs(d2_theta) == 0, subs(d2_Z) == 0], [Ia, Ib, Ic]);

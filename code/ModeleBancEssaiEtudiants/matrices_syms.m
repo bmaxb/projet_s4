@@ -6,10 +6,10 @@ m_ps = m_plaque + m_sphere; % kg
 r_sphere = 3.9 / 1000;      % m +/- 0.1mm
 r_ABC = 95.2 / 1000;        % m, rayon de la plaque par rapport aux actionneurs
 r_DEF = 80 / 1000;          % rayon de la plaque par rapport aux points DEF
-R_bobine = 3.6; 		    % Ohms % ? v?rifier!
-L_bobine = 115; 		    % mH
+R_bobine = 3.6; 		    % Ohms % a verifier!
+L_bobine = 115 / 1000;      % mH
 
-
+% Coefficient
 ae = [1.3463 349.0774 1450.3848 703344.2113];
 as = [0.052961 30.5716 -1152.4168 344545.4587];
 
