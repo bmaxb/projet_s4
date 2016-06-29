@@ -21,7 +21,8 @@ tfin = 50;
 
 %initialisation
 bancEssaiConstantes
-bancessai_ini  %faites tous vos calculs de modele ici
+% bancessai_ini  %faites tous vos calculs de modele ici
+equilibre
 
 %Calcul des compensateurs
 %iniCTL_ver4    %Calculez vos compensateurs ici
