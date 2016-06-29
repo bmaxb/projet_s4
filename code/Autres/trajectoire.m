@@ -68,7 +68,34 @@ Vr = (L/(O*Ts));
 % Calcul des coordonnees en x correspondant aux distances constantes
 %% PARTIE A FINALISER...
 dL = L/O;
-X_O = % TODO
+X_O = [X(1)];
+
+for i = 1:O
+    a = X_O(i);
+    b = a + dL;
+    
+    disp(['b: ' num2str(b)]);
+    
+    for j = 1:100
+        
+        dy_a = 0;
+        for k = 1:length(Coef_d1)
+            dy_a = dy_a + Coef_d1(k).*a.^(k-1);
+        end  
+        
+        dy_b = 0;
+        for k = 1:length(Coef_d1)
+            dy_b = dy_b + Coef_d1(k).*b.^(k-1);
+        end
+    
+        F_b = dL - trapz([a b], [sqrt(1 + (dy_a)^2) sqrt(1 + (dy_b)^2)]);
+        dF_b = 0 - sqrt(1 + (dy_b)^2); 
+        
+        b = a - F_b/dF_b;
+        disp(['b: ' num2str(b)]);
+        pause;
+    end
+end
 
 %% 5 - Calcul des points 
 Y_O = 0;
