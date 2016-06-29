@@ -6,14 +6,14 @@ function [Pi Ltr E Vr Traj tt Tab_banc_essai] = trajectoire(Ni, v_ab, Ts)
 
 X = Ni(:,1);
 Y = Ni(:,2);
-M = 101;
+M = 100;  % 101 points dans les calculs
 
 %% 1 - Calcul des coefficients d'interpolation
 Coef = interpolationGenerique(X, Y, 0.01, 0);
 
 %% 2 - Calcul de la longueur de la trajectoire avec M points
 dx = (max(X)-min(X))/M;
-X_M = min(X):dx:(max(X)-dx);    % Vecteur position X en M points
+X_M = min(X):dx:max(X);    % Vecteur position X en M points
 
 % Calcul des valeurs interpollees de Y
 Y_M = 0;
@@ -66,15 +66,14 @@ O = ceil(L/(Ts*v_ab));
 Vr = (L/(O*Ts));
 
 % Calcul des coordonnees en x correspondant aux distances constantes
-%% PARTIE A FINALISER...
 dL = L/O;
 X_O = [X(1)];
 
 for i = 1:O
     a = X_O(i);
     b = a + dL;
-    
-    disp(['b: ' num2str(b)]);
+    old_b = -1;
+    db = 0.0001;
     
     for j = 1:100
         
@@ -90,11 +89,15 @@ for i = 1:O
     
         F_b = dL - trapz([a b], [sqrt(1 + (dy_a)^2) sqrt(1 + (dy_b)^2)]);
         dF_b = 0 - sqrt(1 + (dy_b)^2); 
+        old_b = b;
+        b = b - F_b/dF_b;
         
-        b = a - F_b/dF_b;
-        disp(['b: ' num2str(b)]);
-        pause;
+        if(((b + db) >= old_b) && ((b - db) <= old_b))
+            break;
+        end
     end
+    
+    X_O = [X_O b];
 end
 
 %% 5 - Calcul des points 
