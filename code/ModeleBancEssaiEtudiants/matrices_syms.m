@@ -6,8 +6,12 @@ m_ps = m_plaque + m_sphere; % kg
 r_sphere = 3.9 / 1000;      % m +/- 0.1mm
 r_ABC = 95.2 / 1000;        % m, rayon de la plaque par rapport aux actionneurs
 r_DEF = 80 / 1000;          % rayon de la plaque par rapport aux points DEF
-R_bobine = 3.6; 		    % Ohms % ? v?rifier!
-L_bobine = 115; 		    % mH
+R_bobine = 3.6; 		    % Ohms % a verifier!
+L_bobine = 115 / 1000;      % mH
+
+% Coefficient
+ae = [1.3463 349.0774 1450.3848 703344.2113];
+as = [0.052961 30.5716 -1152.4168 344545.4587];
 
 b_E1 = 13.029359254409743;
 
@@ -33,9 +37,6 @@ T_DEF = [YD -XD 1;
          YF -XF 1;];
 
 % Variables symbolique ----------------------------------------------------
-ae = sym('ae',[4 1]);
-as = sym('as',[4 1]);
-
 % 3 entrees
 syms Va Vb Vc;
 V = [Va Vb Vc];
@@ -77,26 +78,26 @@ d_Ic = (Vc - R_bobine*Ic) / L_bobine;
 EQ = [d_phi d_theta d_Z d2_phi d2_theta d2_Z d_Xs d_Ys d2_Xs d2_Ys d_Ia d_Ib d_Ic];
 
 % Creation du systeme lineaire --------------------------------------------
+clc; disp('Calcul de la matrice A...')
 A = sym('A', [13 13]);
 for i = 1:13
     for j = 1:13
-        clc; disp(['Calcul de la matrice A(' num2str(i) ', ' num2str(j) ')...'])
         A(i, j) = diff(EQ(i), X(j));
     end
 end
 
+clc; disp('Calcul de la matrice B...')
 B = sym('B', [13 3]);
 for i = 1:13
     for j = 1:3
-        clc; disp(['Calcul de la matrice B(' num2str(i) ', ' num2str(j) ')...'])
         B(i, j) = diff(EQ(i), V(j));
     end
 end
 
+clc; disp('Calcul de la matrice C...')
 C = sym('C', [7 13]);
 for i = 1:7
     for j = 1:13
-        clc; disp(['Calcul de la matrice C(' num2str(i) ', ' num2str(j) ')...'])
         C(i, j) = diff(Y(i), X(j));
     end
 end
@@ -105,50 +106,3 @@ D = zeros(7, 3);
 
 clc; disp('Matrices A, B, C and D complété!')
 
-% Variables a l'etat d'equilibre ------------------------------------------
-[phi, theta, Z, xs, ys] = deal(0);
-
-as1 = 0.052961; as2 = 30.5716; as3 = -1152.4168; as4 = 344545.4587;
-% Pour -1A:
-ae1 = 1.3463; ae2 = 349.0774; ae3 = 1450.3848; ae4 = 703344.2113;
-% Pour -2A:
-%ae1 = 1.3334; ae2 = 362.2141; ae3 = 2183.4014; ae4 = 705425.2882;
-
-disp('Calcul des valeurs de courants a l''équilibre...')
-[Ia_eq, Ib_eq, Ic_eq] = solve([subs(d2_phi) == 0, subs(d2_theta) == 0, subs(d2_Z) == 0], [Ia, Ib, Ic]);
-clc;
-
-% Matrices ABCD à l'equilibre ---------------------------------------------
-[phi_eq, theta_eq, Z0_eq, w_phi_eq, w_theta_eq, v_z_eq, xs_eq, ys_eq, v_sx_eq, v_sy_eq] = deal(0);
-
-Va_eq = Ia_eq*R_bobine;
-Vb_eq = Ib_eq*R_bobine;
-Vc_eq = Ic_eq*R_bobine;
-
-Ia = Ia_eq; Ib = Ib_eq; Ic = Ic_eq;
-Va = Va_eq; Vb = Vb_eq; Vc = Vc_eq;
-
-disp('Valeurs des courants/tension a l''équilibre: ')
-disp(['Ia = ' num2str(double(Ia)) ' A'])
-disp(['Ib = ' num2str(double(Ib)) ' A'])
-disp(['Ic = ' num2str(double(Ic)) ' A'])
-disp(['Va = ' num2str(double(Va)) ' V'])
-disp(['Vb = ' num2str(double(Vb)) ' V'])
-disp(['Vc = ' num2str(double(Vc)) ' V'])
-
-disp(' ')
-A = double(subs(A));
-B = double(subs(B));
-C = double(subs(C));
-D = double(subs(D));
-disp('Substitution des matrices ABCD à l''équilibre terminé!')
-
-% Linéarisation des forces
-
-
-% syms phi theta Z w_phi w_theta v_z xs ys v_sx v_sy Ia Ib Ic Va Vb Vc real
-% delta_x = [phi-phi_eq, theta-theta_eq, Z-Z0_eq, w_phi-w_phi_eq, w_theta-w_theta_eq, v_z-v_z_eq, xs-xs_eq, ys-ys_eq, v_sx-v_sx_eq, v_sy-v_sy_eq, Ia-Ia_eq, Ib-Ib_eq, Ic-Ic_eq]';
-% delta_u = [Va-Va_eq, Vb-Vb_eq, Vc-Vc_eq]';
-% 
-% delta_x_p = A*delta_x+B*delta_u;
-% delta_y = C*delta_x+D*delta_u;

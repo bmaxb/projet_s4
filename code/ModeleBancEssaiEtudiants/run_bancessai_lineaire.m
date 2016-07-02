@@ -1,6 +1,6 @@
 clc; clear; close all; 
 % Initialisation des matrices --------------------------------------------- 
-MatlabProjet 
+equilibre 
 
 % Simulink ----------------------------------------------------------------
 U = double([Va, Vb, Vc]);
