@@ -4,7 +4,7 @@ matrices_syms
 % Variables a l'etat d'equilibre ------------------------------------------
 phi = 0;
 theta = 0;
-Z = 0;
+Z = 0.02;
 xs = 0;
 ys = 0;
 
@@ -44,6 +44,35 @@ C = double(subs(C));
 D = double(subs(D));
 disp('Substitution des matrices ABCD à l''équilibre terminé!')
 
+% Force à l'équilibre -----------------------------------------------------
+FC_eq = (m_sphere*g*ys_eq/cosd(30) - m_ps*g*r_ABC + m_sphere*g*ys_eq*tand(30) + m_sphere*g*xs_eq)/(3*r_ABC);
+FB_eq = FC_eq - (m_sphere*g*ys_eq/(r_ABC*cosd(30)));
+FA_eq = -FB_eq - FC_eq - m_ps*g;
+
+% Comparaison modèle des actionneurs --------------------------------------
+% *Fait avec seulement un déplacement en hauteur et non en angle
+Z = 0.0275;
+dZ = Z - Z0_eq;
+syms Ia Ib Ic
+[Ia_eq2, Ib_eq2, Ic_eq2] = solve([subs(d2_phi) == 0, subs(d2_theta) == 0, subs(d2_Z) == 0], [Ia, Ib, Ic]);
+Ix = Ib_eq2;
+dIx = Ix - Ib_eq;
+dphi = 0;
+dtheta = 0;
+XX = XB;
+YX = YB;
+FX = subs(FX);
+% On veut évaluer dFX à l'équilibre
+Z = Z0_eq;
+Ix = Ib_eq;
+dFX = subs(dFX);
+err_lin = 100*abs(dFX/FX); % en %
+% Pour avoir err_lin < 10% : si Z_eq = 0, dZ_max = +0.0002
+%                            si Z_eq = 0.01, dZ_max = -0.0093, +0.0144
+%                            si Z_eq = 0.02, dZ_max = -0.014, +0.0075
+% Conclusion : Pour avoir une bonne approximation, dZ doit être petit. On
+% remarque que plus Z_eq augmente, plus on peut avoir un grand dZ jusqu'à
+% un certain point ou dZ se met à diminuer en fonction de Z_eq.
 
 % syms phi theta Z w_phi w_theta v_z xs ys v_sx v_sy Ia Ib Ic Va Vb Vc real
 % delta_x = [phi-phi_eq, theta-theta_eq, Z-Z0_eq, w_phi-w_phi_eq, w_theta-w_theta_eq, v_z-v_z_eq, xs-xs_eq, ys-ys_eq, v_sx-v_sx_eq, v_sy-v_sy_eq, Ia-Ia_eq, Ib-Ib_eq, Ic-Ic_eq]';
