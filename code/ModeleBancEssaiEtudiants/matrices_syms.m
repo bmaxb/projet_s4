@@ -51,7 +51,7 @@ dm_E = Z - XE*theta;
 dm_F = Z + YF*phi - XF*theta;
 Y = [dm_D dm_E dm_F xs, ys, v_sx, v_sy];
 
-% Linearisation des forces electromagnetiques -----------------------------
+% Forces electromagnetiques -----------------------------------------------
 Zk = @(xk, yk) Z - xk*theta + yk*phi;
 Fe = @(ik, zk) ((ik^2 + b_E1*abs(ik))*sign(ik)) / (ae(1) + ae(2)*zk + ae(3)*zk^2 + ae(4)*zk^3);
 Fs = @(zk) (-1) / (as(1) + as(2)*zk + as(3)*zk^2 + as(4)*zk^3);
@@ -59,6 +59,16 @@ Fs = @(zk) (-1) / (as(1) + as(2)*zk + as(3)*zk^2 + as(4)*zk^3);
 FA = Fe(Ia, Zk(XA, YA)) + Fs(Zk(XA, YA));
 FB = Fe(Ib, Zk(XB, YB)) + Fs(Zk(XB, YB));
 FC = Fe(Ic, Zk(XC, YC)) + Fs(Zk(XC, YC));
+
+% Version linéaire du modèle des actionneurs ------------------------------
+% *le d représante un delta
+syms Ix XX YX dIx dZ dtheta dphi
+FX = Fe(Ix, Zk(XX, YX)) + Fs(Zk(XX, YX));
+dFX_Ix = diff(FX,Ix);
+dFX_Z = diff(FX,Z);
+dFX_theta = diff(FX,theta);
+dFX_phi = diff(FX,phi);
+dFX = dFX_Ix*dIx + dFX_Z*dZ + dFX_theta*dtheta + dFX_phi*dphi;
 
 % 13 equations ------------------------------------------------------------
 d_phi = w_phi;
@@ -105,4 +115,3 @@ end
 D = zeros(7, 3);
 
 clc; disp('Matrices A, B, C and D complété!')
-
