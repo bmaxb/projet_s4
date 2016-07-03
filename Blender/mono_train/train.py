@@ -32,6 +32,10 @@ def set_parent(parent, *children):
 def get_children(obj):
     return [child for child in bpy.data.objects if child.parent == obj]
 
+# Retourne l'angle a partir d'un vecteur unitair
+def get_rotation_euler(unit_vector):
+    return mathutils.Vector(((pi/2)+pi-atan2(y, z), 0.0, pi-atan2(y, x)))
+
 def add_track_part(location):
     track = rail.copy()
     scene.objects.link(track)
