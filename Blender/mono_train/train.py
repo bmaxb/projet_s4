@@ -7,6 +7,7 @@ from math import *
 ops = bpy.ops
 scene = bpy.context.scene
 
+# Fonctions ------------------------------------------------------------------------
 deselect_all = lambda: ops.object.select_all(action='DESELECT')
 
 # Selectionne dans Blender la liste d'objets
@@ -31,6 +32,12 @@ def set_parent(parent, *children):
 def get_children(obj):
     return [child for child in bpy.data.objects if child.parent == obj]
 
+def add_track_part(location):
+    track = rail.copy()
+    scene.objects.link(track)
+    set_parent(rail, track)
+    track.location = location
+
 # Ajoute un point de l'animation avec la position xy et l'angle
 def set_keyframe(frame, *objects):
     for obj in objects:
@@ -40,39 +47,56 @@ def set_keyframe(frame, *objects):
         obj.keyframe_insert(data_path="location", frame=frame)
         obj.keyframe_insert(data_path="rotation_euler", frame=frame)
 
-# Variables de la scène
+# Variables de la scene ------------------------------------------------------------
 scene.frame_start = 0
 scene.frame_end = 280
+camera = bpy.data.objects["Camera"]
 train = bpy.data.objects["Train"]
 rail = bpy.data.objects["RailDouble"]
 
-# Variable de position du vaisseau
 hi = 8.7 # hauteur initiale
 v_train = 10 # m/s
 direction = mathutils.Vector((0.0, -1.0, 0.0)) # .normalize()
 
-# Position initial
-train.location = (0, 0, hi) # (xpos, ypos, zpos)
+# Position initial -----------------------------------------------------------------
+camera.location = (-11, -9, 14) # (xpos, ypos, zpos)
+train.location = (0, 0, hi)
 rail.location = (0, 0, hi-1)
 set_keyframe(0, train)
 
-# Destruction de l'ancien chemin de fer
+# Destruction de l'ancien chemin de fer --------------------------------------------
 delete_objects(get_children(rail))
 
-# Creation du chemin de fer
-rail_pos = rail.location
-for b in range(4):
-    track = rail.copy()
-    scene.objects.link(track)
-    set_parent(rail, track)
-    # rail_pos -= (0.6*direction)
-    # track.location = rail_pos
+# Creation du chemin de fer --------------------------------------------------------
+rail_pos = rail.location.copy()
+# Arriere du chemin de fer
+for b in range(25):
+    rail_pos -= (0.6*direction)
+    add_track_part(rail_pos)
 
-# Calcul des positions du train
+# Animation ------------------------------------------------------------------------
+rail_pos = rail.location.copy()
 for frame in range(scene.frame_end):
     t = frame/24 # s
     
+    # Train
     s = (1/24)*v_train
     train.location += s*direction
-            
+
+    # Chemin de fer
+    rail_pos += s*direction
+    add_track_part(rail_pos)
+
+    # Camera
+    camera.location += s*direction
+
+    
+    # Sauvegarde
     set_keyframe(frame, train)
+    set_keyframe(frame, camera)
+
+
+# Devant du chemin de fer
+for b in range(25):
+    rail_pos += (0.6*direction)
+    add_track_part(rail_pos)
