@@ -1,6 +1,6 @@
 % Initialisation des valeurs et des matrices ------------------------------
 matrices_syms
-
+% test ced
 % Variables a l'etat d'equilibre ------------------------------------------
 phi = 0;
 theta = 0;
