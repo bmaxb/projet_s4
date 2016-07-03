@@ -5,6 +5,7 @@ close all; clear all ;clc
 equilibre
 I = [Ia Ib Ic]';
 V = [Va Vb Vc]';
+positions = [phi theta Z]';
 u = [0 r_ABC*cosd(30) -r_ABC*cosd(30); -r_ABC r_ABC*sind(30) r_ABC*sind(30); 1 1 1 ];
 u_inv = inv(u);
 decoup_phi = [0 1 0; A(4,1) 0 A(4,11); 0 0 A(11,11)];
@@ -21,6 +22,24 @@ C_sphere = [1 0; 0 1];
 D_sphere = [0 0]';
 C_plaque = [1 0 0];% ; 0 1 0 ; 0 0 1];
 D_plaque = 0;
+syms phi Z theta Ia Ib Ic;
+PP_11 = (r_ABC * cosd(30)) / Ixy * (diff(FB,phi) - diff(FC,phi));
+PP_22 = (-r_ABC / Ixy) * (diff(FA,theta) - (diff(FB,theta) * sind(30)) - (diff(FC,theta) * sind(30)));
+PP_33 = (diff(FA,Z) + diff(FB,Z) + diff(FC,Z))/m_plaque;
+PC = diff(FA,Ia) .* [1/Ixy 0 0; 0 1/Ixy 0; 0 0 1/m_plaque];
+phi = phi_eq;
+theta = theta_eq;
+Z = Z0_eq;
+Ia = Ia_eq;
+Ib = Ib_eq;
+Ic = Ic_eq;
+PP_11_eq = subs(PP_11);
+PP_22_eq = subs(PP_22);
+PP_33_eq = subs(PP_33);
+
+PC_eq = subs(PC);
+
+PP = [PP_11_eq 0 0; 0 PP_22_eq 0; 0 0 PP_33_eq];
 
 %% Calculs
 
@@ -28,6 +47,12 @@ disp('La matrice des courants Iphi, Itheta et Iz = ')
 I_ang = u*I
 disp('La matrice des tensions Vphi, Vtheta et Vz = ')
 V_ang = u*V
+disp('La matrice des accelerations wphi, wtheta et Vz = ')
+i_phi_eq = I_ang(1,1); i_theta_eq = I_ang(2,1); i_z_eq = I_ang(3,1);
+syms i_phi i_theta i_z real
+syms phi theta Z real
+acc = PP * u_inv * [phi theta Z]' + PC_eq * u_inv * [i_phi i_theta i_z]';
+i_phi = i_phi_eq; i_theta = i_theta_eq; i_z = i_z_eq;
 
 %% fonctions de transfert de la sphere
 
@@ -50,6 +75,7 @@ Gs = series(Gsx1,Gsx2);
 Gp_phi = tf(num3,den3)
 Gp_theta = tf(num4,den4)
 Gp_z = tf(num5,den5)
+
 
 
 

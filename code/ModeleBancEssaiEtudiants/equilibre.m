@@ -4,7 +4,7 @@ matrices_syms
 % Variables a l'etat d'equilibre ------------------------------------------
 phi = 0;
 theta = 0;
-Z = 0.02;
+Z = 0.03;
 xs = 0;
 ys = 0;
 
@@ -51,22 +51,22 @@ FA_eq = -FB_eq - FC_eq - m_ps*g;
 
 % Comparaison modèle des actionneurs --------------------------------------
 % *Fait avec seulement un déplacement en hauteur et non en angle
-Z = 0.0275;
-dZ = Z - Z0_eq;
-syms Ia Ib Ic
-[Ia_eq2, Ib_eq2, Ic_eq2] = solve([subs(d2_phi) == 0, subs(d2_theta) == 0, subs(d2_Z) == 0], [Ia, Ib, Ic]);
-Ix = Ib_eq2;
-dIx = Ix - Ib_eq;
-dphi = 0;
-dtheta = 0;
-XX = XB;
-YX = YB;
-FX = subs(FX);
-% On veut évaluer dFX à l'équilibre
-Z = Z0_eq;
-Ix = Ib_eq;
-dFX = subs(dFX);
-err_lin = 100*abs(dFX/FX); % en %
+% Z = 0.0275;
+% dZ = Z - Z0_eq;
+% syms Ia Ib Ic
+% [Ia_eq2, Ib_eq2, Ic_eq2] = solve([subs(d2_phi) == 0, subs(d2_theta) == 0, subs(d2_Z) == 0], [Ia, Ib, Ic]);
+% Ix = Ib_eq2;
+% dIx = Ix - Ib_eq;
+% dphi = 0;
+% dtheta = 0;
+% XX = XB;
+% YX = YB;
+% FX = subs(FX);
+% % On veut évaluer dFX à l'équilibre
+% Z = Z0_eq;
+% Ix = Ib_eq;
+% dFX = subs(dFX);
+% err_lin = 100*abs(dFX/FX); % en %
 % Pour avoir err_lin < 10% : si Z_eq = 0, dZ_max = +0.0002
 %                            si Z_eq = 0.01, dZ_max = -0.0093, +0.0144
 %                            si Z_eq = 0.02, dZ_max = -0.014, +0.0075
