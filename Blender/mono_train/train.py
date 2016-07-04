@@ -8,39 +8,35 @@ ops = bpy.ops
 scene = bpy.context.scene
 
 # Fonctions ------------------------------------------------------------------------
-deselect_all = lambda: ops.object.select_all(action='DESELECT')
 
-# Selectionne dans Blender la liste d'objets
-def select_objects(objs):
-    deselect_all()
-    for obj in objs:
-        obj.select = True
-
-# Supprime une liste d'objets
-def delete_objects(objs):
-    select_objects(objs)
+# Supprime un objet par son nom
+def delete_object(obj_name):
+    ops.object.select_all(action='DESELECT')
+    bpy.data.objects[obj_name].select = True
     ops.object.delete() 
 
-# Definie l'objet parent d'une liste d'objets enfants
-def set_parent(parent, *children):
-    parent.select = True
-    select_objects(children)
-    bpy.context.scene.objects.active = parent 
-    ops.object.parent_set()
+# Cree une ligne joignant tous les points, dont la forme est définie par modeler_name
+def make_polyline(name, coords, origin, modeler_name, material_name):
+    if bpy.data.objects.get(name) is not None:
+        delete_object(name)
+    
+    curvedata = bpy.data.curves.new(name=name+'_curve', type='CURVE')
+    curvedata.dimensions = '3D'
+    curvedata.bevel_object = bpy.data.objects[modeler_name]
 
-# Retourne la liste des enfants d'un objet
-def get_children(obj):
-    return [child for child in bpy.data.objects if child.parent == obj]
+    objectdata = bpy.data.objects.new(name, curvedata)
+    objectdata.data.materials.append(bpy.data.materials.get(material_name))
+    objectdata.location = origin # (0,0,0) object origin
+    bpy.context.scene.objects.link(objectdata)
 
-# Retourne l'angle a partir d'un vecteur unitair
-def get_rotation_euler(unit_vector):
-    return mathutils.Vector(((pi/2)+pi-atan2(y, z), 0.0, pi-atan2(y, x)))
+    len_coords = len(coords)
+    polyline = curvedata.splines.new('POLY')
+    polyline.points.add(len_coords-1)
+    for num in range(len_coords):
+        x, y, z = coords[num]
+        polyline.points[num].co = (x, y, z, 1)
 
-def add_track_part(location):
-    track = rail.copy()
-    scene.objects.link(track)
-    set_parent(rail, track)
-    track.location = location
+    return objectdata
 
 # Ajoute un point de l'animation avec la position xy et l'angle
 def set_keyframe(frame, *objects):
@@ -54,46 +50,40 @@ def set_keyframe(frame, *objects):
 # Variables de la scene ------------------------------------------------------------
 scene.frame_start = 0
 scene.frame_end = 280
+fps = 24
 camera = bpy.data.objects["Camera"]
 train = bpy.data.objects["Train"]
-rail = bpy.data.objects["RailDouble"]
 
 hi = 8.7 # hauteur initiale
 v_train = 10 # m/s
+s = (1/fps)*v_train # position de deplacement par frame
 direction = mathutils.Vector((0.0, -1.0, 0.0)) # .normalize()
 
 # Position initial -----------------------------------------------------------------
-camera.location = (-11, -9, 14) # (xpos, ypos, zpos)
+camera.location = (-11.5, -9, 14) # (xpos, ypos, zpos)
 train.location = (0, 0, hi)
-rail.location = (0, 0, hi-1)
+railway_origin = (0, 0, hi-1)
 set_keyframe(0, train)
 
-# Destruction de l'ancien chemin de fer --------------------------------------------
-delete_objects(get_children(rail))
 
 # Creation du chemin de fer --------------------------------------------------------
-rail_pos = rail.location.copy()
+coords = [mathutils.Vector((0.0, 0.0, 0.0))]
 # Arriere du chemin de fer
 for b in range(25):
-    rail_pos -= (0.6*direction)
-    add_track_part(rail_pos)
+    coords.insert(0, coords[0]-0.6*direction)
 
 # Animation ------------------------------------------------------------------------
-rail_pos = rail.location.copy()
 for frame in range(scene.frame_end):
-    t = frame/24 # s
+    t = frame/fps # s
     
     # Train
-    s = (1/24)*v_train
     train.location += s*direction
 
     # Chemin de fer
-    rail_pos += s*direction
-    add_track_part(rail_pos)
+    coords.append(coords[-1] + s*direction)
 
     # Camera
     camera.location += s*direction
-
     
     # Sauvegarde
     set_keyframe(frame, train)
@@ -102,5 +92,6 @@ for frame in range(scene.frame_end):
 
 # Devant du chemin de fer
 for b in range(25):
-    rail_pos += (0.6*direction)
-    add_track_part(rail_pos)
+    coords.append(coords[-1]+0.6*direction)
+
+left_railway = make_polyline('Railway_L', coords, railway_origin, 'Rail_Modeler', 'concrete')
