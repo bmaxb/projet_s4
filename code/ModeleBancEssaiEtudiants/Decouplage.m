@@ -32,19 +32,23 @@ PC_22_eq = sym2poly(PC_eq(2,2));
 PC_33_eq = sym2poly(PC_eq(3,3));
 PP = [PP_11_eq 0 0; 0 PP_22_eq 0; 0 0 PP_33_eq];
 
-decoup_phi = [0 1 0; PP_11_eq 0 PC_11_eq; 0 0 A(11,11)];
-decoup_theta = [0 1 0; PP_22_eq 0 PC_22_eq; 0 0 A(12,12)];
-decoup_z = [0 1 0; PP_33_eq 0 PC_33_eq; 0 0 A(13,13)];
-decoup_phi_in = [0 0 B(11,1)]';
-decoup_theta_in = [0 0 B(12,2)]';
-decoup_z_in = [0 0 B(13,3)]';
+CV = [B(11,:);B(12,:);B(13,:)];
+%CV = CV * u_inv;
+CC = [A(11,11) A(11,12) A(11,13); A(12,11) A(12,12) A(12,13); A(13,11) A(13,12) A(13,13)];
+%CC = CC * u_inv;
+decoup_phi = [0 1 0; PP(1,1) 0 PC_11_eq; 0 0 CC(1,1)];
+decoup_theta = [0 1 0; PP(2,2) 0 PC_22_eq; 0 0 CC(2,2)];
+decoup_z = [0 1 0; PP(3,3) 0 PC_33_eq; 0 0 CC(3,3)];
+decoup_phi_in = [0 0 CV(1,1)]';
+decoup_theta_in = [0 0 CV(2,2)]';
+decoup_z_in = [0 0 CV(3,3)]';
 decoup_sp_x = [0 1;0 0];
 decoup_sp_y = [0 1;0 0];
 decoup_sp_x_in = [0 A(9,2)]';
 decoup_sp_y_in = [0 A(10,1)]';
 C_sphere = [1 0; 0 1];
 D_sphere = [0 0]';
-C_plaque = [1 0 0];% ; 0 1 0 ; 0 0 1];
+C_plaque = [1 0 0];
 D_plaque = 0;
 
 

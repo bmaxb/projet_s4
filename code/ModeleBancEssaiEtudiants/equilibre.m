@@ -4,7 +4,7 @@ matrices_syms
 % Variables a l'etat d'equilibre ------------------------------------------
 phi = 0;
 theta = 0;
-Z = 0.03;
+Z = 0.015;
 xs = 0;
 ys = 0;
 
