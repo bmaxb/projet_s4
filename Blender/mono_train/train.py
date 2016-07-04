@@ -18,6 +18,7 @@ def delete_object(obj_name):
 # Cree une ligne joignant tous les points, dont la forme est définie par modeler_name
 def make_polyline(name, coords, origin, modeler_name, material_name):
     if bpy.data.objects.get(name) is not None:
+        print(name)
         delete_object(name)
     
     curvedata = bpy.data.curves.new(name=name+'_curve', type='CURVE')
@@ -37,6 +38,10 @@ def make_polyline(name, coords, origin, modeler_name, material_name):
         polyline.points[num].co = (x, y, z, 1)
 
     return objectdata
+
+# Retourne l'angle a partir d'un vecteur unitair
+def get_rotation_euler(v):
+    return mathutils.Vector((pi+atan2(v.z, v.y), 0, atan2(v.y, v.x)+(pi/2))) # (((pi/2)+pi-atan2(v.y, v.z), 0.0, pi-atan2(v.y, v.x)))
 
 # Ajoute un point de l'animation avec la position xy et l'angle
 def set_keyframe(frame, *objects):
@@ -62,7 +67,6 @@ direction = mathutils.Vector((0.0, -1.0, 0.0)) # .normalize()
 # Position initial -----------------------------------------------------------------
 camera.location = (-11.5, -9, 14) # (xpos, ypos, zpos)
 train.location = (0, 0, hi)
-railway_origin = (0, 0, hi-1)
 set_keyframe(0, train)
 
 
@@ -78,6 +82,7 @@ for frame in range(scene.frame_end):
     
     # Train
     train.location += s*direction
+    train.rotation_euler = get_rotation_euler(direction)
 
     # Chemin de fer
     coords.append(coords[-1] + s*direction)
@@ -94,4 +99,11 @@ for frame in range(scene.frame_end):
 for b in range(25):
     coords.append(coords[-1]+0.6*direction)
 
-left_railway = make_polyline('Railway_L', coords, railway_origin, 'Rail_Modeler', 'concrete')
+
+# Creation des rails du chemin de fer ----------------------------------------------
+railway_origin = mathutils.Vector((0, 0, hi))
+rail_offset = mathutils.Vector((0.8, 0.0, 0.0))
+
+#left_offset = mathutils.Vector((rail_offset, 0.0, 0.0))
+left_railway = make_polyline('Railway_L', coords, railway_origin+rail_offset, 'Rail_Modeler', 'concrete')
+right_railway = make_polyline('Railway_R', coords, railway_origin-rail_offset, 'Rail_Modeler', 'concrete')
