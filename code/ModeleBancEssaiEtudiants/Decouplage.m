@@ -1,14 +1,12 @@
 close all; clear all ;clc
 
-%% Variables
+%% Variables et calculs de matrices diagonales
 
 equilibre
 I = [Ia Ib Ic]';
 V = [Va Vb Vc]';
 positions = [phi theta Z]';
 u = [0 r_ABC*cosd(30) -r_ABC*cosd(30); -r_ABC r_ABC*sind(30) r_ABC*sind(30); 1 1 1 ];
-
-%% calculs de matrices decouplees
 
 u_inv = inv(u);
 
@@ -17,22 +15,26 @@ PP_11 = (r_ABC * cosd(30)) / Ixy * (diff(FB,phi) - diff(FC,phi));
 PP_22 = (-r_ABC / Ixy) * (diff(FA,theta) - (diff(FB,theta) * sind(30)) - (diff(FC,theta) * sind(30)));
 PP_33 = (diff(FA,Z) + diff(FB,Z) + diff(FC,Z))/m_plaque;
 PC = diff(FA,Ia) .* [1/Ixy 0 0; 0 1/Ixy 0; 0 0 1/m_plaque];
-phi = phi_eq;
-theta = theta_eq;
-Z = Z0_eq;
-Ia = Ia_eq;
-Ib = Ib_eq;
-Ic = Ic_eq;
+
+phi = phi_eq; theta = theta_eq; Z = Z0_eq; 
+Ia = Ia_eq; Ib = Ib_eq; Ic = Ic_eq;
+
 PP_11_eq = subs(PP_11);
 PP_22_eq = subs(PP_22);
 PP_33_eq = subs(PP_33);
+PP_11_eq = sym2poly(PP_11_eq);
+PP_22_eq = sym2poly(PP_22_eq);
+PP_33_eq = sym2poly(PP_33_eq);
 
 PC_eq = subs(PC);
-
+PC_11_eq = sym2poly(PC_eq(1,1));
+PC_22_eq = sym2poly(PC_eq(2,2));
+PC_33_eq = sym2poly(PC_eq(3,3));
 PP = [PP_11_eq 0 0; 0 PP_22_eq 0; 0 0 PP_33_eq];
-decoup_phi = [0 1 0; PP_11_eq 0 PC_eq(1,1); 0 0 A(11,11)];
-decoup_theta = [0 1 0; PP_22_eq 0 PC_eq(2,2); 0 0 A(12,12)];
-decoup_z = [0 1 0; PP_33_eq 0 PC_eq(3,3); 0 0 A(13,13)];
+
+decoup_phi = [0 1 0; PP_11_eq 0 PC_11_eq; 0 0 A(11,11)];
+decoup_theta = [0 1 0; PP_22_eq 0 PC_22_eq; 0 0 A(12,12)];
+decoup_z = [0 1 0; PP_33_eq 0 PC_33_eq; 0 0 A(13,13)];
 decoup_phi_in = [0 0 B(11,1)]';
 decoup_theta_in = [0 0 B(12,2)]';
 decoup_z_in = [0 0 B(13,3)]';
