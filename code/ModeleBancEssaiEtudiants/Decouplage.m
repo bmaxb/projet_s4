@@ -11,20 +11,6 @@ u = [0 r_ABC*cosd(30) -r_ABC*cosd(30); -r_ABC r_ABC*sind(30) r_ABC*sind(30); 1 1
 %% calculs de matrices decouplees
 
 u_inv = inv(u);
-decoup_phi = [0 1 0; A(4,1) 0 A(4,11); 0 0 A(11,11)];
-decoup_theta = [0 1 0; A(5,2) 0 A(5,12); 0 0 A(12,12)];
-decoup_z = [0 1 0; A(6,3) 0 A(6,13); 0 0 A(13,13)];
-decoup_phi_in = [0 0 B(11,1)]';
-decoup_theta_in = [0 0 B(12,2)]';
-decoup_z_in = [0 0 B(13,3)]';
-decoup_sp_x = [0 1;0 0];
-decoup_sp_y = [0 1;0 0];
-decoup_sp_x_in = [0 A(9,2)]';
-decoup_sp_y_in = [0 A(10,1)]';
-C_sphere = [1 0; 0 1];
-D_sphere = [0 0]';
-C_plaque = [1 0 0];% ; 0 1 0 ; 0 0 1];
-D_plaque = 0;
 
 syms phi Z theta Ia Ib Ic;
 PP_11 = (r_ABC * cosd(30)) / Ixy * (diff(FB,phi) - diff(FC,phi));
@@ -44,6 +30,21 @@ PP_33_eq = subs(PP_33);
 PC_eq = subs(PC);
 
 PP = [PP_11_eq 0 0; 0 PP_22_eq 0; 0 0 PP_33_eq];
+decoup_phi = [0 1 0; PP_11_eq 0 PC_eq(1,1); 0 0 A(11,11)];
+decoup_theta = [0 1 0; PP_22_eq 0 PC_eq(2,2); 0 0 A(12,12)];
+decoup_z = [0 1 0; PP_33_eq 0 PC_eq(3,3); 0 0 A(13,13)];
+decoup_phi_in = [0 0 B(11,1)]';
+decoup_theta_in = [0 0 B(12,2)]';
+decoup_z_in = [0 0 B(13,3)]';
+decoup_sp_x = [0 1;0 0];
+decoup_sp_y = [0 1;0 0];
+decoup_sp_x_in = [0 A(9,2)]';
+decoup_sp_y_in = [0 A(10,1)]';
+C_sphere = [1 0; 0 1];
+D_sphere = [0 0]';
+C_plaque = [1 0 0];% ; 0 1 0 ; 0 0 1];
+D_plaque = 0;
+
 
 %% Calculs
 
@@ -54,12 +55,12 @@ disp('La matrice des tensions Vphi, Vtheta et Vz = ')
 V_ang = u*V
 
 disp('La matrice des accelerations wphi, wtheta et Vz = ')
-i_phi_eq = I_ang(1,1); i_theta_eq = I_ang(2,1); i_z_eq = I_ang(3,1);
+i_phi_eq = I_ang(1,1); i_theta_eq = I_ang(2,1); i_z_eq = I_ang(3,1)
 
 syms i_phi i_theta i_z real
 syms phi theta Z real
-acc = PP * u_inv * [phi theta Z]' + PC_eq * u_inv * [i_phi i_theta i_z]';
-i_phi = i_phi_eq; i_theta = i_theta_eq; i_z = i_z_eq;
+acc = PP * u_inv * [phi theta Z]' + PC_eq * u_inv * [i_phi i_theta i_z]'
+i_phi = i_phi_eq; i_theta = i_theta_eq; i_z = i_z_eq
 
 %% fonctions de transfert de la sphere
 
@@ -73,7 +74,7 @@ Gsy2 = tf(num2(2,:),den2);
 
 Gs = series(Gsx1,Gsx2);
 
-%% fonctions de transfert de la plaque
+% fonctions de transfert de la plaque
 
 [num3,den3] = ss2tf(decoup_phi, decoup_phi_in, C_plaque, D_plaque);
 [num4,den4] = ss2tf(decoup_theta, decoup_theta_in, C_plaque, D_plaque);
