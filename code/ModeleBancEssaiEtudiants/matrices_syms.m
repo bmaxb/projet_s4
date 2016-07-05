@@ -1,40 +1,4 @@
-% Constantes --------------------------------------------------------------
-g = 9.81;				    % m/s^2
-m_plaque = 0.425; 	        % kg +/- 10g
-m_sphere = 0.008; 	        % kg +/- 0.2g
-m_ps = m_plaque + m_sphere; % kg
-r_sphere = 3.9 / 1000;      % m +/- 0.1mm
-r_ABC = 95.2 / 1000;        % m, rayon de la plaque par rapport aux actionneurs
-r_DEF = 80 / 1000;          % rayon de la plaque par rapport aux points DEF
-R_bobine = 3.6; 		    % Ohms % a verifier!
-L_bobine = 115 / 1000;      % mH
-
-% Coefficient
-ae = [1.3463 349.0774 1450.3848 703344.2113];
-as = [0.052961 30.5716 -1152.4168 344545.4587];
-
-b_E1 = 13.029359254409743;
-
-Ixy = 0.0011691; % +/- 0.2 kg*m^2 % Jxy
-
-XA = r_ABC;
-YA = 0;
-XB = -r_ABC*sind(30);
-YB = r_ABC*cosd(30);
-XC = XB;
-YC = -YB;
-
-% Coordonnees inertielles
-XD = r_DEF*sind(30);
-YD = r_DEF*cosd(30);
-XE = -r_DEF;
-YE = 0;
-XF = XD;
-YF = -YD;
-
-T_DEF = [YD -XD 1;
-         YE -XE 1;
-         YF -XF 1;];
+bancEssaiConstantes
 
 % Variables symbolique ----------------------------------------------------
 % 3 entrees
@@ -74,9 +38,9 @@ dFX = dFX_Ix*dIx + dFX_Z*dZ + dFX_theta*dtheta + dFX_phi*dphi;
 d_phi = w_phi;
 d_theta = w_theta;
 d_Z = v_z;
-d2_phi = (r_ABC*cosd(30)*(FB - FC) + m_sphere*g*ys) / Ixy;
-d2_theta = -(r_ABC*(FA - (FB + FC)*sind(30)) + m_sphere*g*xs) / Ixy;
-d2_Z = (FA + FB + FC + m_ps*g) / m_ps;
+d2_phi = (rABC*cosd(30)*(FB - FC) + mS*g*ys) / Ixy;
+d2_theta = -(rABC*(FA - (FB + FC)*sind(30)) + mS*g*xs) / Ixy;
+d2_Z = (FA + FB + FC + mtot*g) / mtot;
 d_Xs = v_sx;
 d_Ys = v_sy;
 d2_Xs = (-g*theta) / 1.4;

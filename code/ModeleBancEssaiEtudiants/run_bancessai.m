@@ -1,9 +1,6 @@
-close all
-clear all
-clc
+close all; clear; clc
 
 % Position à l'équilibre de la sphère (pour tests statiques)
-sig = 1.0;         % Présence (1) ou non (0) de la sphère
 xSeq = 0.000;      % Position x de la sphère à l'équilibre en metres
 ySeq = 0.000;      % Position y de la sphère à l'équilibre en metres
 
@@ -20,7 +17,7 @@ z_des     = [t_des, [1 1 1 1  1  1 1 1 1]'*.015];
 tfin = 50;
 
 %initialisation
-bancEssaiConstantes
+% bancEssaiConstantes
 % bancessai_ini  %faites tous vos calculs de modele ici
 equilibre
 

@@ -6,15 +6,15 @@ equilibre
 I = [Ia Ib Ic]';
 V = [Va Vb Vc]';
 positions = [phi theta Z]';
-u = [0 r_ABC*cosd(30) -r_ABC*cosd(30); -r_ABC r_ABC*sind(30) r_ABC*sind(30); 1 1 1 ];
+u = [0 rABC*cosd(30) -rABC*cosd(30); -rABC rABC*sind(30) rABC*sind(30); 1 1 1 ];
 
 u_inv = inv(u);
 
 syms phi Z theta Ia Ib Ic;
-PP_11 = (r_ABC * cosd(30)) / Ixy * (diff(FB,phi) - diff(FC,phi));
-PP_22 = (-r_ABC / Ixy) * (diff(FA,theta) - (diff(FB,theta) * sind(30)) - (diff(FC,theta) * sind(30)));
-PP_33 = (diff(FA,Z) + diff(FB,Z) + diff(FC,Z))/m_plaque;
-PC = diff(FA,Ia) .* [1/Ixy 0 0; 0 1/Ixy 0; 0 0 1/m_plaque];
+PP_11 = (rABC * cosd(30)) / Ixy * (diff(FB,phi) - diff(FC,phi));
+PP_22 = (-rABC / Ixy) * (diff(FA,theta) - (diff(FB,theta) * sind(30)) - (diff(FC,theta) * sind(30)));
+PP_33 = (diff(FA,Z) + diff(FB,Z) + diff(FC,Z))/mP;
+PC = diff(FA,Ia) .* [1/Ixy 0 0; 0 1/Ixy 0; 0 0 1/mP];
 
 phi = phi_eq; theta = theta_eq; Z = Z0_eq; 
 Ia = Ia_eq; Ib = Ib_eq; Ic = Ic_eq;

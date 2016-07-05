@@ -45,9 +45,9 @@ D = double(subs(D));
 disp('Substitution des matrices ABCD à l''équilibre terminé!')
 
 % Force à l'équilibre -----------------------------------------------------
-FC_eq = (m_sphere*g*ys_eq/cosd(30) - m_ps*g*r_ABC + m_sphere*g*ys_eq*tand(30) + m_sphere*g*xs_eq)/(3*r_ABC);
-FB_eq = FC_eq - (m_sphere*g*ys_eq/(r_ABC*cosd(30)));
-FA_eq = -FB_eq - FC_eq - m_ps*g;
+FC_eq = (mS*g*ys_eq/cosd(30) - mtot*g*rABC + mS*g*ys_eq*tand(30) + mS*g*xs_eq)/(3*rABC);
+FB_eq = FC_eq - (mS*g*ys_eq/(rABC*cosd(30)));
+FA_eq = -FB_eq - FC_eq - mtot*g;
 
 % syms phi theta Z w_phi w_theta v_z xs ys v_sx v_sy Ia Ib Ic Va Vb Vc real
 % delta_x = [phi-phi_eq, theta-theta_eq, Z-Z0_eq, w_phi-w_phi_eq, w_theta-w_theta_eq, v_z-v_z_eq, xs-xs_eq, ys-ys_eq, v_sx-v_sx_eq, v_sy-v_sy_eq, Ia-Ia_eq, Ib-Ib_eq, Ic-Ic_eq]';
