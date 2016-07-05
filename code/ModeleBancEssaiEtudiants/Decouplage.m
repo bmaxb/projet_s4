@@ -1,4 +1,4 @@
-close all; clear all ;clc
+
 
 %% Variables et calculs de matrices diagonales
 
@@ -50,7 +50,6 @@ C_sphere = [1 0; 0 1];
 D_sphere = [0 0]';
 C_plaque = [1 0 0];
 D_plaque = 0;
-
 
 %% Calculs
 
