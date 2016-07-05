@@ -21,13 +21,13 @@ Z0_eq = Z;
 xs_eq = xs;
 ys_eq = ys;
 
-ZD_eq = Z0_eq + YD*phi_eq - XD*theta_eq;
-ZE_eq = Z0_eq - XE*theta_eq;
-ZF_eq = Z0_eq + YF*phi_eq - XF*theta_eq;
-
 Va_eq = Ia_eq*R_bobine;
 Vb_eq = Ib_eq*R_bobine;
 Vc_eq = Ic_eq*R_bobine;
+
+zD_eq=Z0_eq+YD*phi_eq-XD*theta_eq;
+zE_eq=Z0_eq+YE*phi_eq-XE*theta_eq;
+zF_eq=Z0_eq+YF*phi_eq-XF*theta_eq;
 
 % Pour la substition des matrices------------------------------------------
 Ia = Ia_eq; Ib = Ib_eq; Ic = Ic_eq;

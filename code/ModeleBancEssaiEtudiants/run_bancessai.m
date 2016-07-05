@@ -22,16 +22,22 @@ tfin = 50;
 %initialisation
 bancEssaiConstantes
 % bancessai_ini  %faites tous vos calculs de modele ici
-equilibre
+Decouplage
 
 %Calcul des compensateurs
 %iniCTL_ver4    %Calculez vos compensateurs ici
 
 %simulation
-open_system('DYNctl_ver4_etud_obfusc')
-set_param('DYNctl_ver4_etud_obfusc','AlgebraicLoopSolver','LineSearch')
-sim('DYNctl_ver4_etud_obfusc')
+modele = 'JB_obfusc'; % 'JB_obfusc' 'nonlineaire' 'decouple' 'lineaire'
+open_system(['DYNctl_ver4_etud_' modele])
+set_param(['DYNctl_ver4_etud_' modele],'AlgebraicLoopSolver','LineSearch')
+sim(['DYNctl_ver4_etud_' modele])
 
+figure
+hold on
+%plot(tsim, ylineaire(:,1))
+%plot(tsim, ynonlineaire(:,7))
+%plot(tsim, ydecouple(:,1))
 
 %affichage
 %trajectoires
