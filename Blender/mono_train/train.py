@@ -54,7 +54,7 @@ def set_keyframe(frame, *objects):
 
 # Variables de la scene ------------------------------------------------------------
 scene.frame_start = 0
-scene.frame_end = 280
+scene.frame_end = 200
 fps = 24
 camera = bpy.data.objects["Camera"]
 train = bpy.data.objects["Train"]
@@ -77,9 +77,16 @@ for b in range(25):
     coords.insert(0, coords[0]-0.6*direction)
 
 # Animation ------------------------------------------------------------------------
+top = 0.4
+hillstep = top/(scene.frame_end/2)
+hillstep_backward = False
 for frame in range(scene.frame_end):
     t = frame/fps # s
     
+    if not hillstep_backward and direction.z >= top:
+        hillstep = -hillstep
+    direction.z += hillstep
+
     # Train
     train.location += s*direction
     train.rotation_euler = get_rotation_euler(direction)
