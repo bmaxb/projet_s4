@@ -72,10 +72,10 @@ i_phi = i_phi_eq; i_theta = i_theta_eq; i_z = i_z_eq
 [num1,den1] = ss2tf(decoup_sp_x, decoup_sp_x_in, C_sphere, D_sphere);
 [num2,den2] = ss2tf(decoup_sp_y, decoup_sp_y_in, C_sphere, D_sphere);
 
-Gsx1 = tf(num1(1,:),den1);
-Gsx2 = tf(num1(2,:),den1);
-Gsy1 = tf(num2(1,:),den2);
-Gsy2 = tf(num2(2,:),den2);
+Gsx1 = tf(num1(1,:),den1)
+Gsx2 = tf(num1(2,:),den1)
+Gsy1 = tf(num2(1,:),den2)
+Gsy2 = tf(num2(2,:),den2)
 
 Gs = series(Gsx1,Gsx2);
 
@@ -89,6 +89,12 @@ Gp_phi = tf(num3,den3)
 Gp_theta = tf(num4,den4)
 Gp_z = tf(num5,den5)
 
+Gsx_poles = roots(den1)
+Gsy_poles = roots(den2)
+
+Gphi_poles = roots(den3)
+Gtheta_poles = roots(den4)
+Gz_poles = roots(den5)
 
 
 
