@@ -63,6 +63,9 @@ for modele_num = 1:4
     end
 end
 
+
+%affichage
+%trajectoires
 figure(1)
 subplot(2,2,1); title('Position de la bille en x');
 subplot(2,2,2); title('Position de la bille en y');
@@ -73,11 +76,3 @@ figure(2)
 subplot(1,3,1); title('Distance au capteur D');
 subplot(1,3,2); title('Distance au capteur E');
 subplot(1,3,3); title('Distance au capteur F'); legend(modeles)
-
-
-%plot(tsim, ylineaire(:,1))
-%plot(tsim, ynonlineaire(:,7))
-%plot(tsim, ydecouple(:,1))
-
-%affichage
-%trajectoires
