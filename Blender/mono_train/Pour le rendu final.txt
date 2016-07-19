@@ -1,0 +1,3 @@
+- Selectionner le terrain
+- Aller dans "Particle"
+- Emission Number -> 1500000
