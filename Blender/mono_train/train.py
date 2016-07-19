@@ -6,8 +6,16 @@ from math import *
 
 ops = bpy.ops
 scene = bpy.context.scene
+fps = 60
 
 # Fonctions ------------------------------------------------------------------------
+
+# Change le texte a afficher selon l'image en cours
+def recalculate_text(scene):
+    text = bpy.data.objects["CameraText"]
+    text.data.body = "Frame #{0:.0f}, temps: {1:.1f} sec.".format((scene.frame_current), (scene.frame_current/fps))
+
+bpy.app.handlers.frame_change_pre.append(recalculate_text)
 
 # Supprime un objet par son nom
 def delete_object(obj_name):
@@ -55,8 +63,7 @@ def set_keyframe(frame, *objects):
 
 # Variables de la scene ------------------------------------------------------------
 scene.frame_start = 0
-scene.frame_end = 200
-fps = 24
+scene.frame_end = 500
 camera = bpy.data.objects["Camera"]
 train = bpy.data.objects["Train"]
 
@@ -110,6 +117,6 @@ for b in range(25):
 
 
 # Creation des rails du chemin de fer ----------------------------------------------
-railway_origin = mathutils.Vector((0, 0, hi+0.25))
+railway_origin = mathutils.Vector((0, 0, hi-0.2))
 
 railway = make_polyline('Railway', coords, railway_origin, 'Track')
