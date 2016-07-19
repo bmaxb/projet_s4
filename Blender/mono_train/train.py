@@ -16,18 +16,18 @@ def delete_object(obj_name):
     ops.object.delete() 
 
 # Cree une ligne joignant tous les points, dont la forme est définie par modeler_name
-def make_polyline(name, coords, origin, modeler_name, material_name):
+def make_polyline(name, coords, origin, modeler_name):
     if bpy.data.objects.get(name) is not None:
         print(name)
         delete_object(name)
-    
+
+    modeler = bpy.data.objects[modeler_name]
     curvedata = bpy.data.curves.new(name=name+'_curve', type='CURVE')
     curvedata.dimensions = '3D'
-    curvedata.bevel_object = bpy.data.objects[modeler_name]
 
     objectdata = bpy.data.objects.new(name, curvedata)
-    objectdata.data.materials.append(bpy.data.materials.get(material_name))
     objectdata.location = origin # (0,0,0) object origin
+    modeler.location = origin
     bpy.context.scene.objects.link(objectdata)
 
     len_coords = len(coords)
@@ -37,6 +37,7 @@ def make_polyline(name, coords, origin, modeler_name, material_name):
         x, y, z = coords[num]
         polyline.points[num].co = (x, y, z, 1)
 
+    modeler.modifiers["Curve"].object = objectdata
     return objectdata
 
 # Retourne l'angle a partir d'un vecteur unitair
@@ -59,13 +60,13 @@ fps = 24
 camera = bpy.data.objects["Camera"]
 train = bpy.data.objects["Train"]
 
-hi = 8.7 # hauteur initiale
+hi = 0 # hauteur initiale
 v_train = 10 # m/s
 s = (1/fps)*v_train # position de deplacement par frame
 direction = mathutils.Vector((0.0, -1.0, 0.0)) # .normalize()
 
 # Position initial -----------------------------------------------------------------
-camera.location = (-11.5, -9, 14) # (xpos, ypos, zpos)
+camera.location = (-11.5, -8.8, 3.66) # (xpos, ypos, zpos)
 train.location = (0, 0, hi)
 set_keyframe(0, train)
 
@@ -77,7 +78,7 @@ for b in range(25):
     coords.insert(0, coords[0]-0.6*direction)
 
 # Animation ------------------------------------------------------------------------
-top = 0.4
+top = 0.2
 hillstep = top/(scene.frame_end/2)
 hillstep_backward = False
 for frame in range(scene.frame_end):
@@ -86,6 +87,7 @@ for frame in range(scene.frame_end):
     if not hillstep_backward and direction.z >= top:
         hillstep = -hillstep
     direction.z += hillstep
+    direction.x += hillstep*4
 
     # Train
     train.location += s*direction
@@ -108,9 +110,6 @@ for b in range(25):
 
 
 # Creation des rails du chemin de fer ----------------------------------------------
-railway_origin = mathutils.Vector((0, 0, hi))
-rail_offset = mathutils.Vector((0.8, 0.0, 0.0))
+railway_origin = mathutils.Vector((0, 0, hi+0.25))
 
-#left_offset = mathutils.Vector((rail_offset, 0.0, 0.0))
-left_railway = make_polyline('Railway_L', coords, railway_origin+rail_offset, 'Rail_Modeler', 'concrete')
-right_railway = make_polyline('Railway_R', coords, railway_origin-rail_offset, 'Rail_Modeler', 'concrete')
+railway = make_polyline('Railway', coords, railway_origin, 'Track')

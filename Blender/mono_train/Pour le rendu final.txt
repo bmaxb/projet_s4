@@ -1,3 +1,9 @@
+Ajout de l'herbe:
 - Selectionner le terrain
 - Aller dans "Particle"
 - Emission Number -> 1500000
+
+Ajouter des tracks au chemin de fer:
+- Cliquer sur l'objet "Track"
+- Aller dans "Modifier"
+- Ajuster le "Count" de Array jusqu'à complétion du chemin
