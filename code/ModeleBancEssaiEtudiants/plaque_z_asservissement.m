@@ -7,61 +7,47 @@ den = [1 31.3 -1274 -39870];
 FT = tf(num,den);
 
 %% spécifications 
+PMdes = 25;
+wgdes = 185;
 
-Mp = 5/100;
-ts = 0.030;
-tp = 0.025;
-tr = 0.020;
 
 %% paramètres
 
-zeta = sqrt(log(Mp)^2 / (pi^2 + log(Mp)^2));
-wn_ts = 4 / (ts * zeta);
-wn_tp = pi / (sqrt(1-zeta^2)*tp);
-wn_tr = (1 + 1.1*zeta+1.4*zeta^2)/tr;
 
-wn = wn_ts;
+figure
+margin(FT)
 
-pdes = [1 wn*zeta*2 wn^2];
-pdes = roots(pdes);
+[mag,pha] = bode(FT,wgdes);
+kdes = 1/mag;
+[Gm,PM,wp,wg] = margin(FT*kdes);
+dphi = (PMdes - PM +18.2)/2;
+alpha = (1-sind(dphi))/(1+sind(dphi));
+T = 1/(wgdes/2*sqrt(alpha));
+z = -1/T;
+p = -1/(alpha*T);
+ka = kdes/sqrt(alpha);
+numAV = conv([1 -z],[1 -z]);                    %conv(conv(conv([1 -z],[1 -z]),[1 -z]),[1 -z]);
+denAV = conv([1 -p],[1 -p]);                    %conv(conv(conv([1 -p],[1 -p]),[1 -z]),[1 -z]);
+FTa = tf(numAV,denAV)*ka;
 
-figure(1)
-rlocus(FT)
-hold on
-plot(pdes,'p')
-
-phaFT = angle(polyval(num,pdes(1))/polyval(den,pdes(1))) * 180/pi-360;
-
-
-dphi = (-180 - phaFT);
-phi = acosd(zeta);
-alpha = 180 - phi;
-z = -134;
-phiz = atand(imag(pdes(1))/(real(pdes(1))-z));
-phiP = phiz - dphi;
-p = real(pdes(1)) - imag(pdes(1))/tand(phiP);
-
-numAv = [1 -z];
-denAv = [1 -p];
-
-FTa = tf(numAv,denAv);
-FTFTa = series(FTa,FT);
-[numka,denka] = tfdata(FTFTa,'v');
-
-ka = abs(polyval(denka,pdes(1))/polyval(numka,pdes(1)));
-
-FTFTa = FTFTa * ka;
-poles = pzmap(FTFTa);
+FTFTa = 1.23*FT*FTa;
 
 figure(2)
-rlocus(FTFTa)
-hold on
-plot(pdes,'p')
-plot(poles,'s')
+margin(FTFTa)
 
-figure(3)
-step(feedback(FTFTa,1))
-stepinfo(feedback(FTFTa,1))
+%% Retard de phase
+[numkpos denkpos] = tfdata(FTFTa,'v');
+erp = 0.0004;
+kposdes = 1/erp -1;
+kpos = numkpos(end)/denkpos(end);
+kdes = kposdes/kpos;   % gain negatif pas normal!!!
+Tre = 10/wgdes;
+zre = -1/Tre;
+pre = -1/(kdes*Tre);
+numRE = [1 -zre];
+denRE = [1 -pre];
+FTe = tf(numRE,denRE);
+
 
 
 
