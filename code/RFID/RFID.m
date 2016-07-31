@@ -14,7 +14,7 @@ M = 2; % Nombre d'emetteurs sur le Bw
 signal = signal_2b; % signal etudier
 baud = baud_2b; % réponse baud à titre de comparaison
 
-showgraph = [1 2 3 4 5];
+showgraph = 1;
 
 F0 = 436327400; % 436.3274 MHz
 F1 = 10700000; % 10.7 MHz 
@@ -24,8 +24,8 @@ Br = 66000; %Baudrate... nb de symboles
 Ts = time(2) - time(1);
 Fs = 1/Ts;
 
-if ismember(1,showgraph)
-    figure
+if showgraph == 1
+    figure(1)
     plot(abs(fft(signal)))
     title('FFT du signal après A/D')
 end
@@ -42,7 +42,7 @@ oscill = @(x) sin(2*pi*L_O2*x);
 % application de la sinusoide au signal
 signal = signal.*oscill(time);
 
-if ismember(2,showgraph)
+if showgraph == 1
     hold on
     plot(abs(fft(signal)))
     title('FFT du signal')
@@ -61,14 +61,14 @@ filtre = butter_lowpass(4, Fpass/Fn);
 % Rejet d'image sur le signal
 signal = filter(filtre,signal);
     
-if ismember(3,showgraph)
+if showgraph == 1
     hold on
     [h,w] = freqz(filtre,N/2);
     m = max(abs(fft(signal)));
     plot(abs(h)*m)
     stem(Fcentrer*N/Fs,m)
     
-    figure
+    figure(2)
     plot((abs(fft(signal))))
     title('FFT du signal après rejet d''image')
 end
@@ -88,8 +88,8 @@ nbSamples = 12;
 nbBauds = length(signal)/nbSamples;
 Fs2 = Br*nbSamples;
 
-if ismember(4,showgraph)
-    figure
+if showgraph == 1
+    figure(3)
     y = (abs(fft(signal)));
     y_max = max(y);
     plot(y)
@@ -119,56 +119,53 @@ for i = 1:M
 end
 
 
-if ismember(5,showgraph)
-    figure
+if showgraph == 1
+    figure(4)
     plot(abs(fft(messages)))
-    title('Messages filtré individuellement')
+    title('Messages filtrés individuellement')
 end
 
 % Demodulateur AM ---------------------------------------------------------
 % Redresseur
 messages = abs(messages);
-
 % Moyenne mobile lente
 window_size = 50;
-moyennes_lente = [];
-for m = 1:M
-    moyenne_lente_L = smooth(messages(:,m), window_size);
-    moyenne_lente_H = smooth(messages(:,m+M), window_size);
+seuil = [];
+for m = 1:M*2
+    moyenne_lente = smooth(messages(:,m), window_size);
     
     % Moyenne des moyennes
-    moyennes_lente(:,m) = (moyenne_lente_L + moyenne_lente_H)./2;
+    seuil(:,m) = mean(moyenne_lente)*1.40;
     
-    if m == 1
-        moyenne = mean(moyenne_lente_L);
-        figure
+    
+    if showgraph == 1
+        figure(4+m)
         hold on
         stem(messages(:,m))
-        plot(moyenne_lente_L)
-        plot(moyenne_lente_H)
-        plot(moyennes_lente(:,m),'LineWidth',2)
-        plot(1:length(messages(:,m)),ones(length(messages(:,m)),1)*moyenne)
-        title('Moyenne mobile lente sur l''émetteur 1')
+        plot(moyenne_lente)
+        plot(seuil(:,m),'LineWidth',2)
+        plot(ones(length(messages(:,m)),1)*seuil(:,m))
+        title(['Moyenne mobile lente du message ' num2str(m)])
+        axis([2800 3200 0 max(messages(:,m))])
     end
 end
 
+messages_moyennes = zeros(size(messages));
 baud_output = [];
 for n = 1:nbSamples:N
     bits = [];
     for m = 1:M
-        seuil = mean(moyennes_lente(n:n+nbSamples-1,m));
-        moyenne_H = mean(messages(n:n+nbSamples-1,m+M));
-        moyenne_L = mean(messages(n:n+nbSamples-1,m));
-        if moyenne_H <= seuil
-            H = 0;
-        else
-            H = 1;
-        end
-        if moyenne_L <= seuil
-            L = 0;
-        else
-            L = 1;
-        end
+        lapse = n:n+nbSamples-1;
+        
+        moyenne_H = mean(messages(lapse,m+M));
+        moyenne_L = mean(messages(lapse,m));
+        
+        messages_moyennes(lapse,m+M) = ones(nbSamples,1)*moyenne_H;
+        messages_moyennes(lapse,m) = ones(nbSamples,1)*moyenne_L;
+        
+        H = moyenne_H > seuil(m+M);
+        L = moyenne_L > seuil(m);
+        
         out = bi2de([L,H]);
         out = (out~=0 && m~=1)*m + out;
         bits = [bits, out];
@@ -176,6 +173,24 @@ for n = 1:nbSamples:N
     baud_output = [baud_output; bits];
 end
 
+if showgraph == 1
+    for m = 1:M*2
+        figure(4+m)
+        hold on
+        plot(messages_moyennes(:,m))
+        
+        figure(4+M*2+1)
+        subplot(M,2,m)
+        hold on
+        stem(messages_moyennes(1:nbSamples:end,m))
+        plot(ones(length(messages_moyennes(:,m))/nbSamples,1)*seuil(:,m))
+        title(['Moyennes du message ' num2str(m) ', seuil = ' num2str(seuil(:,m))])
+        axis tight
+    end
+end
+
+% figure
+% stem(messages_moyennes(1:nbSamples:end,:))
 
 disp(' ')
 err_quad = mean((baud_output-baud).^2);
