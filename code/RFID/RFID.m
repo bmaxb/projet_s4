@@ -83,9 +83,9 @@ for i = 1:M
 end
 F_L = F_H - Bw/2;
 
-nbSamplesPerBaud = 12;
-nbBauds = length(signal)/nbSamplesPerBaud;
-Fs2 = Br*nbSamplesPerBaud;
+nbSamples = 12;
+nbBauds = length(signal)/nbSamples;
+Fs2 = Br*nbSamples;
 
 if ismember(4,showgraph)
     figure
@@ -125,16 +125,53 @@ if ismember(5,showgraph)
 end
 
 % Demodulateur AM ---------------------------------------------------------
+% Redresseur
+messages = abs(messages);
 
-% On pourrait demoduler avec fskdemod()
-dem = abs(signal_1a);
+% Moyenne mobile lente
+window_size = 50;
+moyennes_lente = [];
+for m = 1:M
+    moyenne_lente_L = smooth(messages(:,m), window_size);
+    moyenne_lente_H = smooth(messages(:,m+M), window_size);
+    
+    % Moyenne des moyennes
+    moyennes_lente(:,m) = (moyenne_lente_L + moyenne_lente_H)./2;
+    
+    if m == 1
+        moyenne = mean(moyenne_lente_L);
+        figure
+        hold on
+        stem(messages(:,m))
+        plot(moyenne_lente_L)
+        plot(moyenne_lente_H)
+        plot(moyennes_lente(:,m),'LineWidth',2)
+        plot(1:length(messages(:,m)),ones(length(messages(:,m)),1)*moyenne)
+        title('Moyenne mobile lente sur l''émetteur 1')
+    end
+end
 
-%figure
-%plot(signal_1a)
-%title('Signal de 1a')
-
-%figure
-%plot(abs(fft(signal_1a(1400:3200))))
-%title('Spectre de frequence du signal 1a')
-% baud_a1 = liste des symboles transmis de signal_1a
+output = [];
+for n = 1:nbSamples:N
+    bits = [];
+    for m = 1:M
+        seuil = mean(moyennes_lente(n:n+nbSamples-1,m));
+        moyenne_H = mean(messages(n:n+nbSamples-1,m+M));
+        moyenne_L = mean(messages(n:n+nbSamples-1,m));
+        if moyenne_H <= seuil
+            H = 0;
+        else
+            H = 1;
+        end
+        if moyenne_L <= seuil
+            L = 0;
+        else
+            L = 1;
+        end
+        out = bi2de([L,H]);
+        out = (out~=0)*m + out;
+        bits = [bits, out];
+    end
+    output = [output; bits];
+end
 
