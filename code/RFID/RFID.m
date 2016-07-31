@@ -8,25 +8,20 @@ clc; clear; close all
 % 4 FH2
 % 5 FL3
 % 6 FH3
-
-M = 1; % Nombre d'emetteurs sur le Bw
-F0 = 436327400; % 436.3274 MHz
-Bw = 330000; % 330 kHz
-Br = 66000; %Baudrate... nb de symboles
 load('signaux.mat')
 
+M = 2; % Nombre d'emetteurs sur le Bw
+signal = signal_2b; % signal etudier
 
+showgraph = [1 2 3 4 5];
 
-signal = signal_1a; % signal etudier
-showgraph = [1 2 3 4];
+F0 = 436327400; % 436.3274 MHz
+F1 = 10700000; % 10.7 MHz 
+Bw = 330000; % 330 kHz
+Br = 66000; %Baudrate... nb de symboles
 
-% Calcul de F_H et F_L en fonction de M -----------------------------------
-% +/- 2.2 kHz
-F_H = [];
-for i = 1:M
-    F_H(i) = F0 + Bw*((1 + 2*(i-1))/(4*M));
-end
-F_L = F_H - Bw/2;
+Ts = time(2) - time(1);
+Fs = 1/Ts;
 
 if ismember(1,showgraph)
     figure
@@ -36,7 +31,7 @@ end
 
 % Oscillateur local L_O2 --------------------------------------------------
 L_O2 = 10700000 - Bw/2; % Prend en compte la bande effective
-L_O2 = L_O2 + mod(L_O2,50000); % Transforme en multiple de 50kHz
+L_O2 = L_O2 - mod(L_O2,50000); % Transforme en multiple de 50kHz
 disp(['Valeur de L_O2: ' num2str(L_O2) 'Hz'])
 disp(['Multiple 50k pour L_O2: ' num2str(L_O2/50000)])
 
@@ -50,62 +45,87 @@ if ismember(2,showgraph)
     hold on
     plot(abs(fft(signal)))
     title('FFT du signal')
-    legend('FFT du signal après A/D', 'FFT du signal après L_O_2')
+    legend('FFT du signal après A/D', 'FFT du signal après L_O_2')    
 end
 
 % Rejet de bande ----------------------------------------------------------
 % Trouver la position du peak du signal recentré
 %[max,ind] = max(abs(fft(signal)));
-F1 = 10700000 - L_O2;
-Fs = F1*N/ind;
-Fpass = F1 + Bw/2;
-Fstop = Fpass + Bw/2;
+Fcentrer = F1 - L_O2;
+Fpass = Fcentrer + Bw/2;
+Fn = Fs/2;
 
-filtre = butter_filter(Fs, Fpass, Fstop);
+filtre = butter_lowpass(4, Fpass/Fn);
 
 % Rejet d'image sur le signal
 signal = filter(filtre,signal);
     
 if ismember(3,showgraph)
-    figure
-    plot(abs(fft(signal)))
-    title('FFT du signal après rejet d''image')
     hold on
-    stem(Bw*N/Fs,10000)
+    [h,w] = freqz(filtre,N/2);
+    m = max(abs(fft(signal)));
+    plot(abs(h)*m)
+    stem(Fcentrer*N/Fs,m)
+    
+    figure
+    plot((abs(fft(signal))))
+    title('FFT du signal après rejet d''image')
 end
 
 % Decimation de 64 --------------------------------------------------------
-signal = decimate(signal,40);
+signal = decimate(signal,64);
+
+% Calcul de F_H et F_L en fonction de M -----------------------------------
+% +/- 2.2 kHz
+F_H = [];
+for i = 1:M
+    F_H(i) = Fcentrer + Bw*((1 + 2*(i-1))/(4*M));
+end
+F_L = F_H - Bw/2;
+
+nbSamplesPerBaud = 12;
+nbBauds = length(signal)/nbSamplesPerBaud;
+Fs2 = Br*nbSamplesPerBaud;
 
 if ismember(4,showgraph)
     figure
-    plot(abs(fft(signal)))
+    y = (abs(fft(signal)));
+    y_max = max(y);
+    plot(y)
     title('FFT du signal après décimation de 64')
+    hold on
+    stem(F_L.*(length(signal)/Fs2), ones(M,1)*y_max)
+    stem(F_H.*(length(signal)/Fs2), ones(M,1)*y_max)
 end
+
 
 % Banc de filtres FII------------------------------------------------------
-Fs2 = Br * 14000; % Avoir au moins une Fs de 2 * 436,4924 MHz
-b_FII_FH = {}; a_FII_FH = {}; k_FH = {};
-b_FII_FL = {}; a_FII_FL = {}; k_FL = {};
+N = length(signal);
+Fc_offset = (F_H(1) - F_L(2))/2;
+messages = [];
 for i = 1:M
-    largeur_FL_FH = Bw/(2*M);
-    fc1_FH = F_H(i) - (largeur_FL_FH /2);
-    fc2_FH = F_H(i) + (largeur_FL_FH /2);
-    fc1_FL = F_L(i) - (largeur_FL_FH /2);
-    fc2_FL = F_L(i) + (largeur_FL_FH /2);
+    % F_L
+    [b,a] = butter_bandpass(10, F_L(i), Fc_offset, Fs2);
+    [h,w] = freqz(b,a,N/2);
+    plot(abs(h*y_max))
+    messages(:,i) = filtfilt(b,a,signal);
     
-   [b_FII_FH{i}, a_FII_FH{i}, k_FH{i}] = butter(10, [fc1_FH, fc2_FH]/(Fs2/2), 'bandpass');
-   [b_FII_FL{i}, a_FII_FL{i}, k_FL{i}] = butter(10, [fc1_FL, fc2_FL]/(Fs2/2), 'bandpass');
+    % F_H
+    [b,a] = butter_bandpass(10, F_H(i), Fc_offset, Fs2);
+    [h,w] = freqz(b,a,N/2);
+    plot(abs(h*y_max))
+    messages(:,i+M) = filtfilt(b,a,signal);
 end
 
-for i = 1:M
-    figure 
-    zplane(b_FII_FH{i},a_FII_FH{i})
+
+if ismember(5,showgraph)
     figure
-    zplane(b_FII_FL{i},a_FII_FL{i})
+    plot(abs(fft(messages)))
+    title('Messages filtré individuellement')
 end
 
 % Demodulateur AM ---------------------------------------------------------
+
 % On pourrait demoduler avec fskdemod()
 dem = abs(signal_1a);
 
