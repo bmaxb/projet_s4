@@ -24,7 +24,7 @@ magFT = abs(polyval(num,1j*wg_des)/polyval(den,1j*wg_des));
 kdes = 1/magFT ;
 [GMa,PMa,wga,wpa] = margin(kdes*FT);
 
-for marge = 0:21
+for marge = 21
     
     found = 0;
     dphi = (PM_des - PMa + marge)/2;
@@ -33,7 +33,7 @@ for marge = 0:21
     za = -1/T;
     pa = -1/(T*alpha);
     
-    for kp = 0:20
+    for kp = 4
         numAv = conv([1 -za],[1 -za]);
         denAv = conv([1 -pa],[1 -pa]);
         ka = kdes/sqrt(alpha);
@@ -48,23 +48,23 @@ for marge = 0:21
         beta = abs(polyval(kpos*numFTa,1j*wg_des)/polyval(denFTa,1j*wg_des));
         
             pouce = 20;
-            Tr = pouce/wg_des;
-            zr = -1/Tr;
-            pr = -1/(Tr*beta);
-            kr = kpos/beta;
+            zr = -wg_des/pouce;
 
-            numr = [1 -zr];
-            denr = [1 -pr];
-            FTr = tf(numr*kr,denr);
-            FTFTar = series(FTFTa,FTr);
-            [numFTar,denFTar] = tfdata(FTFTar,'v');
+            numPI = [1 -zr];
+            denPI = [1 0];
+            FTPI = tf(numPI,denPI);
+            FTFTapi = series(FTFTa,FTPI);
+            [numFTar,denFTar] = tfdata(FTFTapi,'v');
 
-            [GM,PM,wg,wp] = margin(FTFTar);
+            [GM,PM,wg,wp] = margin(FTFTapi);
             GM = mag2db(GM);
 
-            kpos = numFTar(end)/denFTar(end);
-            erpr = 1/(1+kpos);
-
+            kvel = numFTar(end)/denFTar(end-1);
+            erpr = 1/kvel;
+            figure
+            nyquist(feedback(FTFTapi,1))
+            figure
+            step(feedback(FTFTapi,1))
             disp(['Avec marge = ',num2str(marge),' et kp = ',num2str(kp)])
 
             disp([])
@@ -99,22 +99,22 @@ end
 
 
 figure(4)
-margin(FTFTar)
+margin(FTFTapi)
 
 figure(5)
-step(feedback(FTFTar,1))
+step(feedback(FTFTapi,1))
 % axis([0 1000 -4 4])
 title('echelon apres l''avance et le retard de phase')
 
 figure(6)
-rlocus(FTFTar)
+rlocus(FTFTapi)
 
-FTFTarbf = feedback(FTFTar,1);
+FTFTarbf = feedback(FTFTapi,1);
 [numFin,denFin] = tfdata(FTFTarbf,'v');
 
 polesFin = roots(denFin);
 
-BW = bandwidth(FTFTarbf);
+
 
 
 
