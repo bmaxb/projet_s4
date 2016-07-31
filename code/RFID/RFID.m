@@ -11,8 +11,8 @@ clc; clear; close all
 load('signaux.mat')
 
 M = 2; % Nombre d'emetteurs sur le Bw
-signal = signal_2b; % signal etudier
-baud = baud_2b; % réponse baud à titre de comparaison
+signal = signal_2a; % signal etudier
+baud = baud_2a; % réponse baud à titre de comparaison
 
 showgraph = 1;
 
@@ -56,14 +56,14 @@ Fcentrer = F1 - L_O2;
 Fpass = Fcentrer + Bw/2;
 Fn = Fs/2;
 
-filtre = butter_lowpass(4, Fpass/Fn);
+[b,a] = butter_lowpass(4, Fpass/Fn);
 
 % Rejet d'image sur le signal
-signal = filter(filtre,signal);
-    
+signal = filter(b,a,signal);
+
 if showgraph == 1
     hold on
-    [h,w] = freqz(filtre,N/2);
+    [h,w] = freqz(b,a,N/2);
     m = max(abs(fft(signal)));
     plot(abs(h)*m)
     stem(Fcentrer*N/Fs,m)
@@ -128,13 +128,22 @@ end
 % Demodulateur AM ---------------------------------------------------------
 % Redresseur
 messages = abs(messages);
+
+% Application d'une fenètre
+fenetre = triang(nbSamples);
+for n = 1:nbSamples:N
+    for m = 1:M*2
+        messages(n:n+nbSamples-1,m) = fenetre.*messages(n:n+nbSamples-1,m);
+    end
+end
+
 % Moyenne mobile lente
 window_size = 50;
 seuil = [];
 for m = 1:M*2
     moyenne_lente = smooth(messages(:,m), window_size);
     
-    % Moyenne des moyennes
+    % Détermination du seuil
     seuil(:,m) = mean(moyenne_lente)*1.40;
     
     
@@ -150,6 +159,7 @@ for m = 1:M*2
     end
 end
 
+% Décodage
 messages_moyennes = zeros(size(messages));
 baud_output = [];
 for n = 1:nbSamples:N

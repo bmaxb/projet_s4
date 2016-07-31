@@ -1,4 +1,4 @@
-function Hd = butter_lowpass(N, Fc)
+function [b,a] = butter_lowpass(N, Fc)
 %UNTITLED Returns a discrete-time filter object.
 
 % MATLAB Code
@@ -13,7 +13,9 @@ function Hd = butter_lowpass(N, Fc)
 % Fc = Cutoff Frequency
 
 % Construct an FDESIGN object and call its BUTTER method.
-h  = fdesign.lowpass('N,F3dB', N, Fc);
-Hd = design(h, 'butter');
+[b,a] = butter(N, Fc, 'low');
+
+%h  = fdesign.lowpass('N,F3dB', N, Fc);
+%Hd = design(h, 'butter');
 
 % [EOF]
