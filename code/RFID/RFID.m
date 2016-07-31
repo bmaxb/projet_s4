@@ -12,6 +12,7 @@ load('signaux.mat')
 
 M = 2; % Nombre d'emetteurs sur le Bw
 signal = signal_2b; % signal etudier
+baud = baud_2b; % réponse baud à titre de comparaison
 
 showgraph = [1 2 3 4 5];
 
@@ -101,7 +102,7 @@ end
 
 % Banc de filtres FII------------------------------------------------------
 N = length(signal);
-Fc_offset = (F_H(1) - F_L(2))/2;
+Fc_offset = (F_H(1) - F_L(end))/2;
 messages = [];
 for i = 1:M
     % F_L
@@ -151,7 +152,7 @@ for m = 1:M
     end
 end
 
-output = [];
+baud_output = [];
 for n = 1:nbSamples:N
     bits = [];
     for m = 1:M
@@ -169,9 +170,15 @@ for n = 1:nbSamples:N
             L = 1;
         end
         out = bi2de([L,H]);
-        out = (out~=0)*m + out;
+        out = (out~=0 && m~=1)*m + out;
         bits = [bits, out];
     end
-    output = [output; bits];
+    baud_output = [baud_output; bits];
 end
 
+
+disp(' ')
+err_quad = mean((baud_output-baud).^2);
+disp(['Erreur quadratique: ' num2str(err_quad)])
+err_diff = sum(baud_output~=baud);
+disp(['Nombre de baud de différence: ' num2str(err_diff)])
