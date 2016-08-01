@@ -140,24 +140,17 @@ for n = 1:nbSamples:N
 end
 
 % Moyenne mobile lente
-window_size = 50;
-seuil = [];
+window_size = nbSamples*150;
+moyennes_lente = [];
 for m = 1:M*2
-    moyenne_lente = smooth(messages(:,m), window_size);
+    % Creation de la moyenne lente
+    y = [mean(messages(1:window_size,m))*ones(window_size,1); messages(:,m); mean(messages(end-window_size:end,m))*ones(window_size,1)];
+    moyenne_lente = smooth(y, window_size);
+    moyenne_lente = moyenne_lente(window_size:end-window_size); % Correction des bordures
     
     % Détermination du seuil
-    constante_de_correction = 1.40;
-    seuil(:,m) = mean(moyenne_lente)*constante_de_correction;
-    
-    if showgraph == 1
-        figure(5+m)
-        hold on
-        stem(messages(:,m))
-        plot(moyenne_lente,'LineWidth',1.5)
-        plot(ones(length(messages(:,m)),1)*seuil(:,m),'LineWidth',1.5)
-        title(['Extrait du signal de la fréquence ' message_name(m,M)])
-        axis([2800 3200 0 max(messages(:,m))])
-    end
+    constante_de_correction = 2;
+    moyennes_lente(:,m) = moyenne_lente;
 end
 
 % Démodulateur FSK --------------------------------------------------------
@@ -171,11 +164,14 @@ for n = 1:nbSamples:N
         moyenne_H = mean(messages(lapse,m+M));
         moyenne_L = mean(messages(lapse,m));
         
+        seuil_H = mean(moyennes_lente(lapse,m+M));
+        seuil_L = mean(moyennes_lente(lapse,m));
+        
         messages_moyennes(lapse,m+M) = ones(nbSamples,1)*moyenne_H;
         messages_moyennes(lapse,m) = ones(nbSamples,1)*moyenne_L;
         
-        H = moyenne_H > seuil(m+M);
-        L = moyenne_L > seuil(m);
+        H = moyenne_H > seuil_H;
+        L = moyenne_L > seuil_L;
         
         out = bi2de([L,H]);
         out = (out~=0 && m~=1)*m + out;
@@ -188,8 +184,12 @@ if showgraph == 1
     for m = 1:M*2
         figure(5+m)
         hold on
+        stem(messages(:,m))
+        plot(moyenne_lente,'LineWidth',1.5)
         plot(messages_moyennes(:,m),'LineWidth',1.5)
-        legend([message_name(m,M) ' dans le temporel'], ['Moyenne lente (' num2str(window_size) ')'], 'Seuil (moyenne-lente*1.4)', 'Moyenne rapide')
+        title(['Extrait du signal de la fréquence ' message_name(m,M)])
+        axis([2800 3200 0 max(messages(:,m))])
+        legend([message_name(m,M) ' dans le temporel'], ['Moyenne lente (' num2str(window_size) ')'], 'Moyenne rapide')
         
         figure(5+M*2+1)
         if m <= M
@@ -199,8 +199,8 @@ if showgraph == 1
         end
         hold on
         stem(messages_moyennes(1:nbSamples:end,m))
-        plot(ones(length(messages_moyennes(:,m))/nbSamples,1)*seuil(:,m))
-        title(['Démodulateur FSK sur ' message_name(m,M) ', seuil = ' num2str(seuil(:,m))])
+        plot(moyennes_lente(1:nbSamples:end,m))
+        title(['Démodulateur FSK sur ' message_name(m,M)]);
         axis tight
     end
 end
