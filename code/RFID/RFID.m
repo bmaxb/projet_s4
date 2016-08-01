@@ -53,7 +53,7 @@ end
 % Trouver la position du peak du signal recentré
 %[max,ind] = max(abs(fft(signal)));
 Fcentrer = F1 - L_O2;
-Fpass = Fcentrer + Bw/2;
+Fpass = Fcentrer + Bw;
 Fn = Fs/2;
 
 [b,a] = butter_lowpass(4, Fpass/Fn);
@@ -120,14 +120,10 @@ end
 
 
 if showgraph == 1
-    figure(10)
+    figure(5)
     plot(abs(fft(messages)))
     title('Messages filtrés individuellement')
 end
-
-% Gain (Beta test!)
-% max_fft = max(max(abs(fft(messages))));
-% Gain = max_fft./max(abs(fft(messages)));
 
 % Demodulateur AM ---------------------------------------------------------
 % Redresseur
@@ -150,9 +146,8 @@ for m = 1:M*2
     % Détermination du seuil
     seuil(:,m) = mean(moyenne_lente)*1.40;
     
-    
     if showgraph == 1
-        figure(4+m)
+        figure(5+m)
         hold on
         stem(messages(:,m))
         plot(moyenne_lente)
@@ -189,23 +184,25 @@ end
 
 if showgraph == 1
     for m = 1:M*2
-        figure(4+m)
+        figure(5+m)
         hold on
         plot(messages_moyennes(:,m))
         
-        figure(4+M*2+1)
-        subplot(M,2,m)
+        figure(5+M*2+1)
+        if m <= M
+            subplot(M,2,2*m-1)
+        else
+            subplot(M,2,(m-M)*2)
+        end
         hold on
         stem(messages_moyennes(1:nbSamples:end,m))
         plot(ones(length(messages_moyennes(:,m))/nbSamples,1)*seuil(:,m))
-        title(['Moyennes du message ' num2str(m) ', seuil = ' num2str(seuil(:,m))])
+        title(['Moyennes du message ' message_name(m,M) ', seuil = ' num2str(seuil(:,m))])
         axis tight
     end
 end
 
-% figure
-% stem(messages_moyennes(1:nbSamples:end,:))
-
+% Analyse des erreurs
 disp(' ')
 err_quad = mean((baud_output-baud).^2);
 disp(['Erreur quadratique: ' num2str(err_quad)])
