@@ -1,3 +1,5 @@
+% Projet S4
+% Equipe P5
 clc; clear; close all
 % Le nombre de colonnes correspond au nombre d'émetteurs.
 % Chaque ligne donne pour chaque émetteur le symbole transmis.
@@ -155,8 +157,10 @@ end
 
 % Démodulateur FSK --------------------------------------------------------
 messages_moyennes = zeros(size(messages));
+bits_output = [];
 baud_output = [];
 for n = 1:nbSamples:N
+    dec = [];
     bits = [];
     for m = 1:M
         lapse = n:n+nbSamples-1;
@@ -175,9 +179,13 @@ for n = 1:nbSamples:N
         
         out = bi2de([L,H]);
         out = (out~=0 && m~=1)*m + out;
-        bits = [bits, out];
+        dec = [dec, out];
+        
+        bits(m+M) = H;
+        bits(m) = L;
     end
-    baud_output = [baud_output; bits];
+    baud_output = [baud_output; dec];
+    bits_output = [bits_output; bits];
 end
 
 if showgraph == 1
@@ -205,9 +213,24 @@ if showgraph == 1
     end
 end
 
-% Analyse des erreurs
+% Analyse des erreurs -----------------------------------------------------
 disp(' ')
 err_quad = mean((baud_output-baud).^2);
 disp(['Erreur quadratique: ' num2str(err_quad)])
 err_diff = sum(baud_output~=baud);
 disp(['Nombre de baud de différence: ' num2str(err_diff)])
+
+% Baud Error Rate ----------------------------------------------------------
+disp(['Baud Error Rate: ' num2str(err_diff/length(bits_output(:,1)))])
+
+% Bit Error Rate ----------------------------------------------------------
+bit_err = [];
+for m = 1:M
+    ref = baud(:,m);
+    ref(ref~=0) = ref(ref~=0) - (m~=1)*m;
+    ref = de2bi(ref);
+    out = [bits_output(:,m), bits_output(:,m+M)];
+    bit_err = [bit_err, biterr(ref, out)];
+end
+bit_err = bit_err/length(bits_output(:,1));
+disp(['Bit Error Rate: ' num2str(bit_err)])
