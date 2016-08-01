@@ -65,7 +65,7 @@ if showgraph == 1
     hold on
     [h,w] = freqz(b,a,N/2);
     m = max(abs(fft(signal)));
-    plot(abs(h)*m)
+    plot(abs(h)*m,'LineWidth',1.5)
     stem(Fcentrer*N/Fs,m)
     
     figure(2)
@@ -108,22 +108,26 @@ for i = 1:M
     % F_L
     [b,a] = butter_bandpass(10, F_L(i), Fc_offset, Fs2);
     [h,w] = freqz(b,a,N/2);
-    plot(abs(h*y_max))
+    plot(abs(h*y_max),'LineWidth',1.5)
     messages(:,i) = filtfilt(b,a,signal);
     
     % F_H
     [b,a] = butter_bandpass(10, F_H(i), Fc_offset, Fs2);
     [h,w] = freqz(b,a,N/2);
-    plot(abs(h*y_max))
+    plot(abs(h*y_max),'LineWidth',1.5)
     messages(:,i+M) = filtfilt(b,a,signal);
 end
 
 
 if showgraph == 1
-    figure(4)
+    figure(10)
     plot(abs(fft(messages)))
     title('Messages filtrés individuellement')
 end
+
+% Gain (Beta test!)
+% max_fft = max(max(abs(fft(messages))));
+% Gain = max_fft./max(abs(fft(messages)));
 
 % Demodulateur AM ---------------------------------------------------------
 % Redresseur
