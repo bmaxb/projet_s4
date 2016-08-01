@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
+#include <ctime>
 
 using namespace std;
 
@@ -83,7 +84,7 @@ void trouverVitesse(double Fe, double positionX[], double positionY[], int nombr
 	}
 }
 
-void afficherVitesse(double *vitesseX, double *vitesseY, int nombreImages)
+void afficherVitesse(double *vitesseX, double *vitesseY, int nombreImages, clock_t tempsProcesseur)
 {
 	cout << endl << "Pour chaque image, la vitesse de la sphere (m / s) est : " << endl << endl
 		 << "en X : ";
@@ -104,11 +105,12 @@ void afficherVitesse(double *vitesseX, double *vitesseY, int nombreImages)
 			cout << ", ";
 		}
 	}
-	cout << endl << endl;
+	cout << endl << endl << "Le temps de calcul est de : " << ((float)tempsProcesseur) / CLOCKS_PER_SEC << " s" << endl << endl;
 }
 
 void main()
 {
+	clock_t tempsProcesseur;
 	double Fe = 30;
 	int nombreImages = 11;
 	double testX[11] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -120,7 +122,9 @@ void main()
 	while (true)
 	{
 		int ordre = selectionnerOrdre();
+		tempsProcesseur = clock();
 		trouverVitesse(Fe, testX, testY, nombreImages, ordre, vitesseX, vitesseY);
-		afficherVitesse(vitesseX, vitesseY, nombreImages);
+		tempsProcesseur = clock() - tempsProcesseur;
+		afficherVitesse(vitesseX, vitesseY, nombreImages, tempsProcesseur);
 	}
 }
