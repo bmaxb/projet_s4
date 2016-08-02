@@ -9,12 +9,6 @@ ops = bpy.ops
 scene = bpy.context.scene
 fps = 60
 
-# Lecture du fichier de coordonnees
-my_data = genfromtxt('xy.csv', delimiter=',') # data from csv file
-coords = []
-for i in range(len(my_data[:,0])):
-    coords.append(mathutils.Vector((my_data[i,0], my_data[i,1], 0.0)))
-
 # Fonctions ------------------------------------------------------------------------
 
 # Change le texte a afficher selon l'image en cours
@@ -69,9 +63,6 @@ def set_keyframe(frame, *objects):
 def get_tangent(v1, v2):
     return (v2 - v1).normalized();
 
-# Variables de la scene ------------------------------------------------------------
-scene.frame_start = 0
-scene.frame_end = len(coords)-1
 
 camera = bpy.data.objects["Camera"]
 train = bpy.data.objects["Train"]
@@ -83,15 +74,29 @@ camera_offset = mathutils.Vector((13.6, 2.3, 3.66)) # (xpos, ypos, zpos)
 train.location = (0, 0, hi)
 set_keyframe(0, train)
 
+# Lecture du fichier de coordonnees ------------------------------------------------
+my_data = genfromtxt('xy.csv', delimiter=',') # data from csv file
+data_length = len(my_data[:,0])
+
+# Variables de la scene ------------------------------------------------------------
+scene.frame_start = 0
+scene.frame_end = data_length-1
+
 # Animation ------------------------------------------------------------------------
-for frame in range(len(coords)-1):
+coords = []
+coords.append(mathutils.Vector((my_data[0,0], my_data[0,1], 0.0)))
+
+for frame in range(data_length-1):
     t = frame/fps # s
     
+    pos = mathutils.Vector((my_data[frame+1,0], my_data[frame+1,1], 0.0))
+    coords.append(pos)
+
     # Train
-    direction = get_tangent(coords[frame], coords[frame+1])
+    direction = get_tangent(coords[-2], coords[-1])
 
     train.rotation_euler = get_rotation_euler(direction)
-    train.location = coords[frame]
+    train.location = pos
 
     # Camera
     camera.location = train.location + camera_offset
