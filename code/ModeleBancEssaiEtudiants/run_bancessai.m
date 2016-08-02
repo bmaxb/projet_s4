@@ -6,7 +6,7 @@ modeles = {'JBobfusc_Asserprof'; 'nonlineaire';'nonlineaire_plaque'; 'JBobfusc'}
 figure
 hold on
 % Position à l'équilibre de la sphère (pour tests statiques)
-sig = 0;            % Présence (1) ou non (0) de la sphère
+sig = 1;            % Présence (1) ou non (0) de la sphère
 xSeq = 0.000;      % Position x de la sphère à l'équilibre en metres
 ySeq = 0.000;      % Position y de la sphère à l'équilibre en metres
 
@@ -16,13 +16,23 @@ Ayeq = 0;               %en degres
 Pzeq = .015;            %en metres
 
 %Exemple de trajectoire
-t_des     = (0:1:8)'*5;
-x_des     = [t_des, [0 0 0.5 1  0 -1 0 1 0]'*0.05];
-y_des     = [t_des, [0 0 0 0 -1  0 1 0 0]'*0.05];
-z_des     = [t_des, [1 1 1 1  1  1 1 1 1]'*0.015];
-Aydes     = [t_des, [0 3 0 1  2  3 0 -1 1]'*pi/180];
-Axdes     = [t_des, [0 0 0 0  0  0 0 0 0]'*pi/180];
-tfin = 50;
+% t_des     = (0:1:8)'*5;
+% x_des     = [t_des, [0 0 0.5 1  0 -1 0 1 0]'*0.05];
+% y_des     = [t_des, [0 0 0 0 -1  0 1 0 0]'*0.05];
+% z_des     = [t_des, [1 1 1 1  1  1 1 1 1]'*0.015];
+% Aydes     = [t_des, [0 3 0 1  2  3 0 -1 1]'*pi/180];
+% Axdes     = [t_des, [0 0 0 0  0  0 0 0 0]'*pi/180];
+% tfin = 50;
+
+Det_trajectoire %Calcul de la trajectoire
+t_des     = (0:1:length(Traj(:,1))-1)'*0.07;
+x_des     = [t_des, Traj(:,1)*0.01];
+y_des     = [t_des, Traj(:,2)*0.01];
+z_des     = [t_des, ones(size(Traj(:,1)))*0.015];
+%Aydes     = [t_des, [0 3 0 1  2  3 0 -1 1]'*pi/180];
+%Axdes     = [t_des, [0 0 0 0  0  0 0 0 0]'*pi/180];
+tfin = t_des(end);
+
 
 %initialisation
 % bancEssaiConstantes
@@ -32,7 +42,7 @@ Decouplage
 %Calcul des compensateurs
 %iniCTL_ver4    %Calculez vos compensateurs ici
 close all;
-for modele_num = 1:2
+for modele_num = 2
     %simulation
     open_system(['DYNctl_ver4_etud_' modeles{modele_num}])
     set_param(['DYNctl_ver4_etud_' modeles{modele_num}],'AlgebraicLoopSolver','LineSearch')
@@ -92,8 +102,8 @@ subplot(1,3,1); title('Distance au capteur D');
 subplot(1,3,2); title('Distance au capteur E');
 subplot(1,3,3); title('Distance au capteur F'); legend(modeles)
 
-output_plaque_bille=[ynonlineaire_60hz(:,7),ynonlineaire_60hz(:,8),ynonlineaire_60hz(:,1),ynonlineaire_60hz(:,2)];
-csvwrite('plaque_bille_blender',output_plaque_bille);
+output_plaque_bille=[ynonlineaire_60hz(:,7)*1000,ynonlineaire_60hz(:,8)*1000,ynonlineaire_60hz(:,1)*50,ynonlineaire_60hz(:,2)*50];
+csvwrite('plaque_bille_blender.csv',output_plaque_bille);
     
 if sig==0
     open_system(['DYNctl_ver4_etud_' modeles{3}])
@@ -107,6 +117,6 @@ if sig==0
     title('Angle phi et theta (control plaque)');
     legend('Phi','Theta')
     
-    output_plaque=[ynonlineaire_plaque_60hz(:,7),ynonlineaire_plaque_60hz(:,8),ynonlineaire_plaque_60hz(:,1),ynonlineaire_plaque_60hz(:,2)];
-    csvwrite('plaque_blender',output_plaque);
+    output_plaque=[ynonlineaire_plaque_60hz(:,7)*1000,ynonlineaire_plaque_60hz(:,8)*1000,ynonlineaire_plaque_60hz(:,1)*1000,ynonlineaire_plaque_60hz(:,2)*1000];
+    csvwrite('plaque_blender.csv',output_plaque);
 end

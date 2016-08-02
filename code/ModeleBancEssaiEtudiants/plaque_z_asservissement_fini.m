@@ -104,12 +104,20 @@ figure
 margin(FTFTar)
 
 figure
-step(feedback(FTFTar,1))
-% axis([0 1000 -4 4])
-title('echelon apres l''avance et le retard de phase')
+nyquist(FTFTar)
 
 figure
+step(feedback(FTFTar,1))
+% axis([0 1000 -4 4])
+title('echelon apres l''avance et le retard de phase (z)')
+
+r = rlocus(FTFTar,1);
+figure
 rlocus(FTFTar)
+hold on
+plot(r,'r.')
+title('Lieu des racines de la FT avec AvPh et RePh (z)')
+legend('FT avec AvPh et RePh','Pôles en BF')
 
 FTFTarbf = feedback(FTFTar,1);
 [numFin,denFin] = tfdata(FTFTarbf,'v');

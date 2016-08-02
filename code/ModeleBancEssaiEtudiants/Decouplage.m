@@ -1,5 +1,6 @@
 % Projet S4
 % Equipe P5
+close all
 
 %% Variables et calculs de matrices diagonales
 

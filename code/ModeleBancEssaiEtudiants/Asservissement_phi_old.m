@@ -1,6 +1,11 @@
 % Projet S4
 % Equipe P5
-
+Decouplage
+clc;
+close all;
+figure,
+rlocus(Gp_phi)
+[numphi, denphi]=tfdata(Gp_phi,'v');
 
 
 %% FTBO
@@ -14,16 +19,16 @@ ts_des = 0.03;
 
 %% a) Traduction des spec
 phi_des = atan(-pi/log(Mp_des));
-zeta_des = cos(phi_des);
-wn_des(1) = (1+1.1*zeta_des+1.4*zeta_des^2)/tr_des;
-wn_des(2) = pi/tp_des/sqrt(1-zeta_des^2);
-wn_des(3) = 4/ts_des/zeta_des;
+z_des = cos(phi_des);
+wn_des(1) = (1+1.1*z_des+1.4*z_des^2)/tr_des;
+wn_des(2) = pi/tp_des/sqrt(1-z_des^2);
+wn_des(3) = 4/ts_des/z_des;
 wn_des = max(wn_des);
-wa_des = wn_des*sqrt(1-zeta_des^2);
+wa_des = wn_des*sqrt(1-z_des^2);
 
 % Pôles désirés
-s_des(1) = -wn_des*zeta_des + wa_des*1i;
-s_des(2) = -wn_des*zeta_des - wa_des*1i;
+s_des(1) = -wn_des*z_des + wa_des*1i;
+s_des(2) = -wn_des*z_des - wa_des*1i;
 
 %% AvPh
 % Lieu des racines de la FT originale
@@ -32,30 +37,29 @@ rlocus(Gs)
 hold on
 plot(s_des,'p')
 axis('auto')
-title('Lieu des racines de la FT originale avec les pôles désirés (phi et theta)')
+title('Lieu des racines de la FT originale avec les pôles désirés')
 legend('FT originale','Pôles désirés')
 
 % Calcul pour l'AvPh
 phase_des = angle(evalfr(Gs,s_des(1)))*180/pi - 360;
 
-delta_phi = (-180 - phase_des) + 15;
+delta_phi = (-180 - phase_des) +12;
+delta_phi1=delta_phi/2;
+delta_phi2=delta_phi-delta_phi1;
 
-delta_phi1 = 50*delta_phi/100;
-delta_phi2 = 50*delta_phi/100;
+alpha=180-acosd(z_des);
 
-z_a1 = -31;
-z_a2 = z_a1;
+phiz1=(alpha+delta_phi1)/2;
+phip1=(alpha-delta_phi1)/2;
 
-% +15, -30.7 , /2
+phiz2=(alpha+delta_phi2)/2;
+phip2=(alpha-delta_phi2)/2;
 
-phiz1 = atand(-imag(s_des(1))/(z_a1 - real(s_des(1))));
-phiz2 = atand(-imag(s_des(1))/(z_a2 - real(s_des(1))));
+z_a1=real(s_des(1))-imag(s_des(1))/tand(phiz1);
+p_a1=real(s_des(1))-imag(s_des(1))/tand(phip1);
 
-phip1 = phiz1 - delta_phi1;
-phip2 = phiz2 - delta_phi2;
-
-p_a1 = real(s_des(1)) - imag(s_des(1))/tand(phip1);
-p_a2 = real(s_des(1)) - imag(s_des(1))/tand(phip2);
+z_a2=real(s_des(1))-imag(s_des(1))/tand(phiz2);
+p_a2=real(s_des(1))-imag(s_des(1))/tand(phip2);
 
 num_a1 = [1 -z_a1];
 den_a1 = [1 -p_a1];
@@ -79,14 +83,10 @@ hold on
 plot(s_des,'s')
 plot(r,'r.')
 axis('auto')
-title('Lieu des racines de la FT originale avec double AvPh (phi et theta)')
-legend('FT originale','Pôles désirés','Pôles en BF')
 
 % Réponse à un échelon unitaire
 figure
 step(feedback(Gs*G_a,1))
-title('Réponse à un step de la FT avec double AvPh (phi et theta)')
-
 s = stepinfo(feedback(Gs*G_a,1))
 
 figure
@@ -94,7 +94,7 @@ margin(Gs*G_a)
 
 %% PI
 % Calcul pour PI
-z_PI = real(s_des(1))/2;
+z_PI = real(s_des(1))/10;
 
 num_PI = [1 -z_PI];
 den_PI = [1 0];
@@ -114,28 +114,21 @@ rlocus(K*Gs*G_a*G_PI)
 hold on
 plot(r,'r.')
 plot(s_des,'s')
-title('Lieu des racines de la FT avec double AvPh et avec PI (phi et theta)')
-legend('FT avec double AvPh et PI','Pôles désirés','Pôles en BF')
+title('Lieu des racines de la FT avec a et avec PI')
+legend('FT avec a','Pôles désirés','Pôles avec retour unitaire','FT avec a et PI')
 
 % Réponse à un échelon unitaire
 figure
 step(feedback(K*Gs*G_a*G_PI,1))
-title('Réponse à un step de la FT avec double AvPh et avec PI (phi et theta)')
 
 s = stepinfo(feedback(K*Gs*G_a*G_PI,1))
 
 figure
 margin(K*Gs*G_a*G_PI)
 
-figure
-nyquist(K*Gs*G_a*G_PI)
-
-
+p_a1
+p_a2
 max(abs(real(r)))
-
-%Fonction de transfert totale
-G_comp_pt=K*G_a*G_PI;
-[num_pt,den_pt]=tfdata(G_comp_pt,'v');
 
 testdiscret(K*G_a*G_PI)
 
