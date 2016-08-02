@@ -35,8 +35,6 @@ end
 % Oscillateur local L_O2 --------------------------------------------------
 L_O2 = 10700000 - Bw/2; % Prend en compte la bande effective
 L_O2 = L_O2 - mod(L_O2,50000); % Transforme en multiple de 50kHz
-disp(['Valeur de L_O2: ' num2str(L_O2) 'Hz'])
-disp(['Multiple 50k pour L_O2: ' num2str(L_O2/50000)])
 
 N = length(signal_1a);
 oscill = @(x) sin(2*pi*L_O2*x);
@@ -60,6 +58,7 @@ Fpass = Fcentrer + Bw;
 Fn = Fs/2;
 
 [b,a] = butter_lowpass(4, Fpass/Fn);
+rejet_image = tf2sos(b,a);
 
 % Rejet d'image sur le signal
 signal = filter(b,a,signal);
@@ -108,18 +107,23 @@ end
 N = length(signal);
 Fc_offset = (F_H(1) - F_L(end))/2;
 messages = [];
+filtres_RII = [];
+m = 1;
 for i = 1:M
     % F_L
-    [b,a] = butter_bandpass(10, F_L(i), Fc_offset, Fs2);
+    [b,a] = butter_bandpass(2, F_L(i), Fc_offset, Fs2);
     [h,w] = freqz(b,a,N/2);
     plot(abs(h*y_max),'LineWidth',1.5)
     messages(:,i) = filtfilt(b,a,signal);
+    filtres_RII(m:m+1,:) = tf2sos(b,a);
     
     % F_H
-    [b,a] = butter_bandpass(10, F_H(i), Fc_offset, Fs2);
+    [b,a] = butter_bandpass(2, F_H(i), Fc_offset, Fs2);
     [h,w] = freqz(b,a,N/2);
     plot(abs(h*y_max),'LineWidth',1.5)
     messages(:,i+M) = filtfilt(b,a,signal);
+    filtres_RII(m+M*2:m+M*2+1,:) = tf2sos(b,a);
+    m = m+2;
 end
 
 
@@ -212,25 +216,58 @@ if showgraph == 1
         axis tight
     end
 end
+% LO2
+% N emetteur
+% Structure filtre : -a1 -a2 b0 b1 b2
+% Filtre rejet dimage Q31
+% banc de filtres rii
+% baud error
 
-% Analyse des erreurs -----------------------------------------------------
+% Affichage des informations ----------------------------------------------
 disp(' ')
-err_quad = mean((baud_output-baud).^2);
-disp(['Erreur quadratique: ' num2str(err_quad)])
+disp(['Valeur de L_O2: ' num2str(L_O2) 'Hz'])
+disp(['Multiple 50k pour L_O2: ' num2str(L_O2/50000)])
+disp(['Nombre d''émetteurs: ' num2str(M)])
+disp(' ')
+
+disp('Structure des filtres: SOS (-a1 -a2 b0 b1 b2)')
+gain_rejet = 2;
+disp(['Gain pour le rejet d''image: ' num2str(gain_rejet)])
+disp('SOS pour rejet d''image: ')
+rejet_image = [-rejet_image(:,5:6) rejet_image(:,1:3)];
+disp(dec2Qformat(rejet_image./gain_rejet,[0,31]))
+
+gain_RII = 4;
+disp(['Gain pour le banc de filtre: ' num2str(gain_RII)])
+disp('SOS du Banc de filtres RII:')
+m = 1;
+for i = 1:2:length(filtres_RII(:,1))
+   disp([message_name(m,M) ':'])
+   sos = filtres_RII(i:i+1,:);
+   sos = [-sos(:,5:6) sos(:,1:3)];
+   
+   disp(dec2Qformat(sos./gain_RII,[0,15]))
+   m = m + 1;
+end
+
+% Baud Error Rate ---------------------------------------------------------
 err_diff = sum(baud_output~=baud);
+disp(['Baud Error Rate: ' num2str(err_diff/length(bits_output(:,1)))])
 disp(['Nombre de baud de différence: ' num2str(err_diff)])
 
-% Baud Error Rate ----------------------------------------------------------
-disp(['Baud Error Rate: ' num2str(err_diff/length(bits_output(:,1)))])
-
-% Bit Error Rate ----------------------------------------------------------
-bit_err = [];
-for m = 1:M
-    ref = baud(:,m);
-    ref(ref~=0) = ref(ref~=0) - (m~=1)*m;
-    ref = de2bi(ref);
-    out = [bits_output(:,m), bits_output(:,m+M)];
-    bit_err = [bit_err, biterr(ref, out)];
+% Autres
+if 1 == 0
+    err_quad = mean((baud_output-baud).^2);
+    disp(['Erreur quadratique: ' num2str(err_quad)])
+    % Bit Error Rate
+    bit_err = [];
+    for m = 1:M
+        ref = baud(:,m);
+        ref(ref~=0) = ref(ref~=0) - (m~=1)*m;
+        ref = de2bi(ref);
+        out = [bits_output(:,m), bits_output(:,m+M)];
+        bit_err = [bit_err, biterr(ref, out)];
+    end
+    bit_err = bit_err/length(bits_output(:,1));
+    disp(['Bit Error Rate: ' num2str(bit_err)])
 end
-bit_err = bit_err/length(bits_output(:,1));
-disp(['Bit Error Rate: ' num2str(bit_err)])
