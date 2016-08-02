@@ -51,7 +51,8 @@ def make_polyline(name, coords, origin, modeler_name):
 
 # Retourne l'angle a partir d'un vecteur unitair
 def get_rotation_euler(v):
-    return mathutils.Vector((atan2(v.z, v.y), 0, atan2(v.y, v.x)+(pi/2))) # (((pi/2)+pi-atan2(v.y, v.z), 0.0, pi-atan2(v.y, v.x)))
+    #return mathutils.Vector((atan2(v.z, v.y), 0, atan2(v.y, v.x)+(pi/2))) # (((pi/2)+pi-atan2(v.y, v.z), 0.0, pi-atan2(v.y, v.x)))
+    return mathutils.Vector((0, 0, atan2(v.y, v.x)+(pi/2))) # (((pi/2)+pi-atan2(v.y, v.z), 0.0, pi-atan2(v.y, v.x)))
 
 # Ajoute un point de l'animation avec la position xy et l'angle
 def set_keyframe(frame, *objects):
@@ -75,7 +76,7 @@ train.location = (0, 0, hi)
 set_keyframe(0, train)
 
 # Lecture du fichier de coordonnees ------------------------------------------------
-my_data = genfromtxt('xy.csv', delimiter=',') # data from csv file
+my_data = genfromtxt('xy_phi_theta.csv', delimiter=',') # data from csv file
 data_length = len(my_data[:,0])
 
 # Variables de la scene ------------------------------------------------------------
@@ -106,7 +107,7 @@ for frame in range(data_length-1):
     set_keyframe(frame, camera)
 
 # Creation des rails du chemin de fer ----------------------------------------------
-direction = get_tangent(coords[1], coords[0])
+direction = get_tangent(coords[31], coords[30])
 for b in range(25):
     coords.insert(0, coords[0]+direction)
 
