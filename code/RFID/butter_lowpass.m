@@ -1,3 +1,5 @@
+% Projet S4
+% Equipe P5
 function [b,a] = butter_lowpass(N, Fc)
 %UNTITLED Returns a discrete-time filter object.
 

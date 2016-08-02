@@ -1,3 +1,5 @@
+% Projet S4
+% Equipe P5
 figure,
 rlocus(Gp_phi)
 [numphi, denphi]=tfdata(Gp_phi,'v');

@@ -1,3 +1,5 @@
+% Projet S4
+% Equipe P5
 % Calcul la derivee numerique arriere d'ordre N des tableaux de position
 % Backward higher-order differences : https://en.wikipedia.org/wiki/Finite_difference#Higher-order_differences
 function derivee = deriveeArriereOrdreSuperieur(x, y, N)

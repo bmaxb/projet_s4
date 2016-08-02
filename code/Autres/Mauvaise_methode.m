@@ -1,3 +1,5 @@
+% Projet S4
+% Equipe P5
 %% Variables d'états de la plaque (position) 
 clc;
 clear all;

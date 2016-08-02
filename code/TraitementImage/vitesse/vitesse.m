@@ -1,3 +1,5 @@
+% Projet S4
+% Equipe P5
 % Calcul la differenciation numerique arriere d ordre N
 function vitesse(Fe, positions, N)
     h = 1/Fe;

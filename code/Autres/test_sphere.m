@@ -1,3 +1,5 @@
+% Projet S4
+% Equipe P5
 function [] = test_sphere(s_path, img_path)
 
     s = imread(s_path);

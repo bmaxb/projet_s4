@@ -1,6 +1,5 @@
-% APP 5
-% Eric Matte et Ian Lachance
-% mate2002, laci2103
+% Projet S4
+% Equipe P5
 function y = dec2Qformat(x, Q)
 %UNTITLED2 Summary of this function goes here   
 % binary number

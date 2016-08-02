@@ -1,3 +1,5 @@
+% Projet S4
+% Equipe P5
 Decouplage
 
 Kp=0.705;

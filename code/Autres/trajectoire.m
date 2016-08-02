@@ -1,3 +1,5 @@
+% Projet S4
+% Equipe P5
 %% Fonction trajectoire
 % Ni        coordonnees intermediaires xi (colonne 1) et yi (colonne 2) en metres, a interpoler pour la trajectoire du point 1 au point N
 % v_ab      vitesse vAB, en m/s, voulue constante sur la trajectoire

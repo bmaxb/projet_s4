@@ -1,3 +1,5 @@
+// Projet S4
+// Equipe P5
 #include <iostream>
 #include <vector>
 #include <math.h>

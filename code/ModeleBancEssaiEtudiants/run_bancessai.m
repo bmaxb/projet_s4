@@ -1,3 +1,5 @@
+% Projet S4
+% Equipe P5
 close all; clear; clc
 
 modeles = {'JBobfusc_Asserprof'; 'nonlineaire';'nonlineaire_plaque'; 'JBobfusc'};

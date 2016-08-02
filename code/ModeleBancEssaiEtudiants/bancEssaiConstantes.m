@@ -1,3 +1,5 @@
+% Projet S4
+% Equipe P5
 g = 9.81; % m/s^2
 
 z_range  = 22.2e-03; % m

@@ -1,3 +1,5 @@
+% Projet S4
+% Equipe P5
 function [b, a] = butter_bandpass(N, Fpass, Fc_offset, Fs)
 %BUTTER_BANDPASS Returns a discrete-time filter object.
 
