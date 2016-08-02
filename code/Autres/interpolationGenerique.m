@@ -1,3 +1,5 @@
+% Projet S4
+% Equipe P5
 function [Coef] = interpolationGenerique(X, Y, Ts, showGraph)
 %INTERPOLATION_GENERIQUE Interpolation Generique
 

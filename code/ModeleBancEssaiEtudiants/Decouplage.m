@@ -1,4 +1,5 @@
-
+% Projet S4
+% Equipe P5
 
 %% Variables et calculs de matrices diagonales
 
@@ -96,7 +97,8 @@ Gphi_poles = roots(den3)
 Gtheta_poles = roots(den4)
 Gz_poles = roots(den5)
 
-
+Asservissement_phi
+plaque_z_asservissement_fini
 
 
 

@@ -3,6 +3,7 @@
 import bpy
 import mathutils
 from math import *
+from numpy import genfromtxt
 
 ops = bpy.ops
 scene = bpy.context.scene
@@ -50,73 +51,65 @@ def make_polyline(name, coords, origin, modeler_name):
 
 # Retourne l'angle a partir d'un vecteur unitair
 def get_rotation_euler(v):
-    return mathutils.Vector((pi+atan2(v.z, v.y), 0, atan2(v.y, v.x)+(pi/2))) # (((pi/2)+pi-atan2(v.y, v.z), 0.0, pi-atan2(v.y, v.x)))
+    #return mathutils.Vector((atan2(v.z, v.y), 0, atan2(v.y, v.x)+(pi/2))) # (((pi/2)+pi-atan2(v.y, v.z), 0.0, pi-atan2(v.y, v.x)))
+    return mathutils.Vector((0, 0, atan2(v.y, v.x)+(pi/2))) # (((pi/2)+pi-atan2(v.y, v.z), 0.0, pi-atan2(v.y, v.x)))
 
 # Ajoute un point de l'animation avec la position xy et l'angle
 def set_keyframe(frame, *objects):
     for obj in objects:
-        # scene.frame_set(frame)
-        # obj.location = (xpos, ypos, zpos)
-        # obj.rotation_euler[1] = theta
         obj.keyframe_insert(data_path="location", frame=frame)
         obj.keyframe_insert(data_path="rotation_euler", frame=frame)
 
-# Variables de la scene ------------------------------------------------------------
-scene.frame_start = 0
-scene.frame_end = 500
+# Determine la direction normaliser entre 2 points
+def get_tangent(v1, v2):
+    return (v2 - v1).normalized();
+
+
 camera = bpy.data.objects["Camera"]
 train = bpy.data.objects["Train"]
 
 hi = 0 # hauteur initiale
-v_train = 10 # m/s
-s = (1/fps)*v_train # position de deplacement par frame
-direction = mathutils.Vector((0.0, -1.0, 0.0)) # .normalize()
 
 # Position initial -----------------------------------------------------------------
-camera.location = (-11.5, -8.8, 3.66) # (xpos, ypos, zpos)
+camera_offset = mathutils.Vector((13.6, 2.3, 3.66)) # (xpos, ypos, zpos)
 train.location = (0, 0, hi)
 set_keyframe(0, train)
 
+# Lecture du fichier de coordonnees ------------------------------------------------
+my_data = genfromtxt('xy_phi_theta.csv', delimiter=',') # data from csv file
+data_length = len(my_data[:,0])
 
-# Creation du chemin de fer --------------------------------------------------------
-coords = [mathutils.Vector((0.0, 0.0, 0.0))]
-# Arriere du chemin de fer
-for b in range(25):
-    coords.insert(0, coords[0]-0.6*direction)
+# Variables de la scene ------------------------------------------------------------
+scene.frame_start = 0
+scene.frame_end = data_length-1
 
 # Animation ------------------------------------------------------------------------
-top = 0.2
-hillstep = top/(scene.frame_end/2)
-hillstep_backward = False
-for frame in range(scene.frame_end):
+coords = []
+coords.append(mathutils.Vector((my_data[0,0], my_data[0,1], 0.0)))
+
+for frame in range(data_length-1):
     t = frame/fps # s
     
-    if not hillstep_backward and direction.z >= top:
-        hillstep = -hillstep
-    direction.z += hillstep
-    direction.x += hillstep*4
+    pos = mathutils.Vector((my_data[frame+1,0], my_data[frame+1,1], 0.0))
+    coords.append(pos)
 
     # Train
-    train.location += s*direction
-    train.rotation_euler = get_rotation_euler(direction)
+    direction = get_tangent(coords[-2], coords[-1])
 
-    # Chemin de fer
-    coords.append(coords[-1] + s*direction)
+    train.rotation_euler = get_rotation_euler(direction)
+    train.location = pos
 
     # Camera
-    camera.location += s*direction
+    camera.location = train.location + camera_offset
     
     # Sauvegarde
     set_keyframe(frame, train)
     set_keyframe(frame, camera)
 
-
-# Devant du chemin de fer
-for b in range(25):
-    coords.append(coords[-1]+0.6*direction)
-
-
 # Creation des rails du chemin de fer ----------------------------------------------
-railway_origin = mathutils.Vector((0, 0, hi-0.2))
+direction = get_tangent(coords[31], coords[30])
+for b in range(25):
+    coords.insert(0, coords[0]+direction)
 
+railway_origin = mathutils.Vector((0, 0, hi-0.2))
 railway = make_polyline('Railway', coords, railway_origin, 'Track')

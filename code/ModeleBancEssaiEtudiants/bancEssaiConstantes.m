@@ -1,3 +1,5 @@
+% Projet S4
+% Equipe P5
 g = 9.81; % m/s^2
 
 z_range  = 22.2e-03; % m
@@ -57,7 +59,7 @@ TDEF_inv = inv(TDEF);
 
 % Données mises à jour le 10 juillet 2015
 % Sphère
-mS = 0.0080;        % kg +/- 0.2g
+mS = 0.0080*sig;        % kg +/- 0.2g
 rS = 0.0039;        % m +/- 0.1mm
 JS = 2*mS*rS^2/5;   % solid kg m^2
 % JS = 2*mS*rS^2/3; % hollow
@@ -72,7 +74,6 @@ Jx =  1169.1e-06;  % kg m^2 +/- 0.2
 Jy =  Jx;         % kg m^2
 Jz = 2329e-06;    % kg m^2
 
-sig = 1;            % Présence (1) ou non (0) de la sphère
 mtot = mP + sig*mS; % kg - mase totale plaque + sphère
 
 % Simulation
@@ -101,3 +102,7 @@ as = [0.052961 30.5716 -1152.4168 344545.4587];
 b_E1 = 13.029359254409743;
 
 Ixy = Jx; % = Jy
+
+%comp tachio
+Kp_sphere=-0.705;
+Kv_sphere=-0.57085;

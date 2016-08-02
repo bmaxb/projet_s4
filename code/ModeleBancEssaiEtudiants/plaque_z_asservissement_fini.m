@@ -1,11 +1,13 @@
-clc; clear all; close all;
+% Projet S4
+% Equipe P5
+%Decouplage
 
 %% fonction de transfert de la plaque en z
 
-num = 47.78;
-den = [1 31.3 -2056 -64350];
-FT = tf(num,den);
-
+% num = 47.78;
+% den = [1 31.3 -2056 -64350];
+FT = Gp_z;
+[num, den]=tfdata(FT,'v');
 %% spécifications 
 
 PM_des = 25;
@@ -98,13 +100,39 @@ end
 % title('echelon apres l''avance de phase')
 
 
-figure(4)
+figure
 margin(FTFTar)
 
-figure(5)
+figure
 step(feedback(FTFTar,1))
 % axis([0 1000 -4 4])
 title('echelon apres l''avance et le retard de phase')
+
+figure
+rlocus(FTFTar)
+
+FTFTarbf = feedback(FTFTar,1);
+[numFin,denFin] = tfdata(FTFTarbf,'v');
+
+polesFin = roots(denFin);
+
+%Fonction trasnfert comp
+G_comp_z=series(FTa*kp,FTr);
+[num_z, den_z]=tfdata(G_comp_z,'v');
+
+S=stepinfo(feedback(FTFTar,1))
+
+testdiscret(G_comp_z)
+
+% 
+% num_z = [2.392e06 2.33e08 6.597e09 4.298e10];
+% den_z = [1 1553 6.03e05 0];
+
+
+
+
+
+
 
 
 

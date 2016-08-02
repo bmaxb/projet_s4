@@ -1,3 +1,5 @@
+% Projet S4
+% Equipe P5
 %% Fonction servant a determiner la position de la sphere sur la plaque
 % img - l'image de la plaque
 % R_sphere - Composante rouge du template de la sphere

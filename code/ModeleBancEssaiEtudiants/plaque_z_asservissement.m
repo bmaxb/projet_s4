@@ -1,3 +1,5 @@
+% Projet S4
+% Equipe P5
 clc; clear all; close all;
 
 %% fonction de transfert de la plaque en z

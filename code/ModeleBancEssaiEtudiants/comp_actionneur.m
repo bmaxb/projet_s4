@@ -1,3 +1,5 @@
+% Projet S4
+% Equipe P5
 % Initialisation des valeurs à l'équilibre --------------------------------
 equilibre
 
