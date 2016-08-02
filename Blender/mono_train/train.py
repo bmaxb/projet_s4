@@ -77,20 +77,17 @@ camera = bpy.data.objects["Camera"]
 train = bpy.data.objects["Train"]
 
 hi = 0 # hauteur initiale
-direction = mathutils.Vector((0.0, 1.0, 0.0)) # .normalize()
 
 # Position initial -----------------------------------------------------------------
 camera_offset = mathutils.Vector((-11.6, 7.9, 3.66)) # (xpos, ypos, zpos)
 train.location = (0, 0, hi)
 set_keyframe(0, train)
 
-
 # Animation ------------------------------------------------------------------------
 for frame in range(len(coords)-1):
     t = frame/fps # s
     
     # Train
-    
     direction = get_tangent(coords[frame], coords[frame+1])
 
     train.rotation_euler = get_rotation_euler(direction)
@@ -103,11 +100,9 @@ for frame in range(len(coords)-1):
     set_keyframe(frame, train)
     set_keyframe(frame, camera)
 
-
 # Creation des rails du chemin de fer ----------------------------------------------
 direction = get_tangent(coords[1], coords[0])
 for b in range(25):
-    #print(coords[0]+0.6*direction)
     coords.insert(0, coords[0]+direction)
 
 railway_origin = mathutils.Vector((0, 0, hi-0.2))
