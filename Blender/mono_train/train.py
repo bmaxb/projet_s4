@@ -49,10 +49,12 @@ def make_polyline(name, coords, origin, modeler_name):
     modeler.modifiers["Curve"].object = objectdata
     return objectdata
 
-# Retourne l'angle a partir d'un vecteur unitair
-def get_rotation_euler(v):
+# x=phi=2, y=theta=3
+
+# Retourne l'angle a partir d'un vecteur direction unitair et des angles
+def get_rotation_euler(v, phi=0.0, theta=0.0):
     #return mathutils.Vector((atan2(v.z, v.y), 0, atan2(v.y, v.x)+(pi/2))) # (((pi/2)+pi-atan2(v.y, v.z), 0.0, pi-atan2(v.y, v.x)))
-    return mathutils.Vector((0, 0, atan2(v.y, v.x)+(pi/2))) # (((pi/2)+pi-atan2(v.y, v.z), 0.0, pi-atan2(v.y, v.x)))
+    return mathutils.Vector((theta, phi, atan2(v.y, v.x)+(pi/2))) # (((pi/2)+pi-atan2(v.y, v.z), 0.0, pi-atan2(v.y, v.x)))
 
 # Ajoute un point de l'animation avec la position xy et l'angle
 def set_keyframe(frame, *objects):
@@ -76,8 +78,9 @@ train.location = (0, 0, hi)
 set_keyframe(0, train)
 
 # Lecture du fichier de coordonnees ------------------------------------------------
-my_data = genfromtxt('xy_phi_theta.csv', delimiter=',') # data from csv file
-data_length = len(my_data[:,0])
+with_angles = True
+csv = genfromtxt('xy_phi_theta.csv', delimiter=',') # data from csv file
+data_length = len(csv[:,0])
 
 # Variables de la scene ------------------------------------------------------------
 scene.frame_start = 0
@@ -85,18 +88,22 @@ scene.frame_end = data_length-1
 
 # Animation ------------------------------------------------------------------------
 coords = []
-coords.append(mathutils.Vector((my_data[0,0], my_data[0,1], 0.0)))
+coords.append(mathutils.Vector((csv[0,0], csv[0,1], 0.0)))
 
 for frame in range(data_length-1):
     t = frame/fps # s
     
-    pos = mathutils.Vector((my_data[frame+1,0], my_data[frame+1,1], 0.0))
+    pos = mathutils.Vector((csv[frame+1,0], csv[frame+1,1], 0.0))
     coords.append(pos)
 
     # Train
     direction = get_tangent(coords[-2], coords[-1])
 
-    train.rotation_euler = get_rotation_euler(direction)
+    if with_angles:
+        train.rotation_euler = get_rotation_euler(direction, csv[frame+1,2], csv[frame+1,3])
+    else:
+        train.rotation_euler = get_rotation_euler(direction)
+
     train.location = pos
 
     # Camera
