@@ -10,7 +10,7 @@ scene = bpy.context.scene
 fps = 60
 
 # Lecture du fichier de coordonnees
-my_data = genfromtxt('coordinates.csv', delimiter=',') # data from csv file
+my_data = genfromtxt('xy.csv', delimiter=',') # data from csv file
 coords = []
 for i in range(len(my_data[:,0])):
     coords.append(mathutils.Vector((my_data[i,0], my_data[i,1], 0.0)))
@@ -79,7 +79,7 @@ train = bpy.data.objects["Train"]
 hi = 0 # hauteur initiale
 
 # Position initial -----------------------------------------------------------------
-camera_offset = mathutils.Vector((-11.6, 7.9, 3.66)) # (xpos, ypos, zpos)
+camera_offset = mathutils.Vector((13.6, 2.3, 3.66)) # (xpos, ypos, zpos)
 train.location = (0, 0, hi)
 set_keyframe(0, train)
 
