@@ -12,9 +12,9 @@ clc; clear; close all
 % 6 FH3
 load('signalTest.mat')
 
-M = 2; % Nombre d'emetteurs sur le Bw
-signal = signal_2test; % signal etudier
-baud = baud_2test; % réponse baud à titre de comparaison
+M = 3; % Nombre d'emetteurs sur le Bw
+signal = signal_3test; % signal etudier
+baud = baud_3test; % réponse baud à titre de comparaison
 
 time = ([0:(760320-1)]/50.688e+6)';
 
@@ -235,13 +235,13 @@ disp(' ')
 disp('Structure des filtres: SOS (-a1 -a2 b0 b1 b2)')
 gain_rejet = 2;
 disp(['Gain pour le rejet d''image: ' num2str(gain_rejet)])
-disp('SOS pour rejet d''image: ')
+disp('SOS pour rejet d''image (Q31): ')
 rejet_image = [-rejet_image(:,5:6) rejet_image(:,1:3)];
 disp(dec2Qformat(rejet_image./gain_rejet,[0,31]))
 
 gain_RII = 4;
 disp(['Gain pour le banc de filtre: ' num2str(gain_RII)])
-disp('SOS du Banc de filtres RII:')
+disp('SOS du Banc de filtres RII (Q15):')
 m = 1;
 for i = 1:2:length(filtres_RII(:,1))
    disp([message_name(m,M) ':'])
