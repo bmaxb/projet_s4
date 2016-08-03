@@ -78,8 +78,8 @@ train.location = (0, 0, hi)
 set_keyframe(0, train)
 
 # Lecture du fichier de coordonnees ------------------------------------------------
-with_angles = True
-csv = genfromtxt('xy_phi_theta.csv', delimiter=',') # data from csv file
+with_angles = False
+csv = genfromtxt('trajectoire.csv', delimiter=',') # data from csv file
 data_length = len(csv[:,0])
 
 # Variables de la scene ------------------------------------------------------------

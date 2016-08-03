@@ -10,11 +10,13 @@ clc; clear; close all
 % 4 FH2
 % 5 FL3
 % 6 FH3
-load('signaux.mat')
+load('signalTest.mat')
 
 M = 2; % Nombre d'emetteurs sur le Bw
-signal = signal_2a; % signal etudier
-baud = baud_2a; % réponse baud à titre de comparaison
+signal = signal_2test; % signal etudier
+baud = baud_2test; % réponse baud à titre de comparaison
+
+time = ([0:(760320-1)]/50.688e+6)';
 
 showgraph = 1;
 
@@ -36,7 +38,7 @@ end
 L_O2 = 10700000 - Bw/2; % Prend en compte la bande effective
 L_O2 = L_O2 - mod(L_O2,50000); % Transforme en multiple de 50kHz
 
-N = length(signal_1a);
+N = length(signal);
 oscill = @(x) sin(2*pi*L_O2*x);
 
 % application de la sinusoide au signal
