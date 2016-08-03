@@ -16,33 +16,34 @@ Ayeq = 0;               %en degres
 Pzeq = .015;            %en metres
 
 %Exemple de trajectoire
-% t_des     = (0:1:8)'*5;
-% x_des     = [t_des, [0 0 0.5 1  0 -1 0 1 0]'*0.05];
-% y_des     = [t_des, [0 0 0 0 -1  0 1 0 0]'*0.05];
-% z_des     = [t_des, [1 1 1 1  1  1 1 1 1]'*0.015];
-% Aydes     = [t_des, [0 3 0 1  2  3 0 -1 1]'*pi/180];
-% Axdes     = [t_des, [0 0 0 0  0  0 0 0 0]'*pi/180];
-% tfin = 50;
+t_des     = (0:1:8)'*5;
+x_des     = [t_des, [0 0 0.5 1  0 -1 0 1 0]'*0.05];
+y_des     = [t_des, [0 0 0 0 -1  0 1 0 0]'*0.05];
+z_des     = [t_des, [1 1 1 1  1  1 1 1 1]'*0.015];
+Aydes     = [t_des, [0 3 0 1  2  3 0 -1 1]'*pi/180];
+Axdes     = [t_des, [0 0 0 0  0  0 0 0 0]'*pi/180];
+tfin = 50;
 
-Det_trajectoire %Calcul de la trajectoire
-t_des     = (0:1:length(Traj(:,1))-1)'*0.07;
-x_des     = [t_des, Traj(:,1)*0.01];
-y_des     = [t_des, Traj(:,2)*0.01];
-z_des     = [t_des, ones(size(Traj(:,1)))*0.015];
-%Aydes     = [t_des, [0 3 0 1  2  3 0 -1 1]'*pi/180];
-%Axdes     = [t_des, [0 0 0 0  0  0 0 0 0]'*pi/180];
-tfin = t_des(end);
+
+% Det_trajectoire %Calcul de la trajectoire
+% t_des     = (0:1:length(Traj(:,1))-1)'*Ts;
+% x_des     = [t_des, Traj(:,1)];
+% y_des     = [t_des, Traj(:,2)];
+% z_des     = [t_des, ones(size(Traj(:,1)))*0.015];
+% %Aydes     = [t_des, [0 3 0 1  2  3 0 -1 1]'*pi/180];
+% %Axdes     = [t_des, [0 0 0 0  0  0 0 0 0]'*pi/180];
+% tfin = t_des(end);
 
 
 %initialisation
-% bancEssaiConstantes
-% bancessai_ini  %faites tous vos calculs de modele ici
-Decouplage
+Decouplage 
+xs_ini=0;  %-0.045; %position initiale de la sphère en x
+ys_ini=0;  %-0.034; %position initiale de la sphère en y
 
 %Calcul des compensateurs
 %iniCTL_ver4    %Calculez vos compensateurs ici
 close all;
-for modele_num = 2
+for modele_num = 1:2
     %simulation
     open_system(['DYNctl_ver4_etud_' modeles{modele_num}])
     set_param(['DYNctl_ver4_etud_' modeles{modele_num}],'AlgebraicLoopSolver','LineSearch')
@@ -104,6 +105,29 @@ subplot(1,3,3); title('Distance au capteur F'); legend(modeles)
 
 output_plaque_bille=[ynonlineaire_60hz(:,7)*1000,ynonlineaire_60hz(:,8)*1000,ynonlineaire_60hz(:,1)*50,ynonlineaire_60hz(:,2)*50];
 csvwrite('plaque_bille_blender.csv',output_plaque_bille);
+
+figure,
+plot(ynonlineaire(:,7),ynonlineaire(:,8))
+hold on
+% plot(NAB(:,1),NAB(:,2),'*r')
+plot(x_des(:,2),y_des(:,2),'*r')
+title('Trajectoire de la bille sur la plaque')
+xlabel('xs(m)')
+ylabel('ys(m)')
+legend('Position de la bille','Points interpolés')
+
+figure,
+plot(tsim,ynonlineaire(:,1)*180/pi,'g')
+hold on
+plot(tsim,ynonlineaire(:,2)*180/pi,'b')
+hold on
+plot(tsim,flag_phi,'r')
+hold on
+plot(tsim,flag_theta,'r')
+title('Angles de la plaques durant la trajectoire')
+xlabel('t(s)')
+ylabel('angle theta ou phi(deg)')
+legend('phi(t)','theta(t)','Flag violation')
     
 if sig==0
     open_system(['DYNctl_ver4_etud_' modeles{3}])

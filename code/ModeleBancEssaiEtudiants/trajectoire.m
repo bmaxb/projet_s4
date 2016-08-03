@@ -114,7 +114,7 @@ plot(X_O, Y_O);
 hold on;
 grid on;
 plot(X, Y, '*r');
-axis([min(X)-2 max(X)+2 min(Y)-2 max(Y)+2]);
+axis([min(X)-2*0.01 max(X)+2*0.01 min(Y)-2*0.01 max(Y)+2*0.01]);
 title('Trajectoire du train');
 xlabel('Position en x (m)');
 ylabel('Position en y (m)');
