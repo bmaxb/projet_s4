@@ -21,7 +21,7 @@ const static int HEADER_SIZE = 54;			// Le header est compose des 54 premiers by
 const static int WIDTH_IN_HEADER = 18;		// Position de l'information sur la largeur de l'image dans le header
 const static int HEIGHT_IN_HEADER = 22;		// Position de l'information sur la hauteur de l'image dans le header
 
-char* TEMPL_PATH = "../../images/templ.rgb";
+char* TEMPL_PATH = "E:/MaximeBreton/OneDrive/Documents/universite/s4/projet/projet_s4/code/Traitement Image/traitement_image/traitement_image/rgb/templ.rgb";
 
 boost::shared_array<uint8_t> load_img(char* filename, int width, int height, bool isOnlyRed)
 {
@@ -76,17 +76,22 @@ extern "C"
 
 int main(int args, char** argv)
 {
-	int N = 10;
+	int N = 1;
 
-	for (int i = 0; i < N; i++)
+	double* posx = new double[23];
+	double* posy = new double[23];
+
+	for (int i = 1; i < N+1; i++)
 	{
-		char* IMAGE_PATH = "";
+		//char* IMAGE_PATH = "";
 
-		std::string a = "/images/image_";
+		/*std::string a = "rgb/image_";
 		a += i;
 		a += ".rgb";
 
-		strcpy(IMAGE_PATH, a.c_str());
+		strcpy(IMAGE_PATH, a.c_str());*/
+
+		char* IMAGE_PATH = "E:/MaximeBreton/OneDrive/Documents/universite/s4/projet/projet_s4/code/Traitement Image/traitement_image/traitement_image/rgb/image_001.rgb";
 
 		std::clock_t startcputime = std::clock();
 
@@ -148,11 +153,14 @@ int main(int args, char** argv)
 			jMax += templHeight / 2;
 		}
 
+		posx[i] = iMax;
+		posy[i] = jMax;
 
 		std::cout << max << "   -  " << jMax << "   -   " << iMax << std::endl;
 
 		double cpu_duration = (std::clock() - startcputime) / (double)CLOCKS_PER_SEC;
 		std::cout << "Finished in " << cpu_duration << " seconds [CPU Clock] " << std::endl;
+		system("pause");
 	}
 
 	return 0;
